@@ -9,18 +9,32 @@ import {
   workspaceFingerprint,
 } from "./hook_utils.mjs";
 
-function recordSuccessMarker(cwd, command) {
+function writeMarker(cwd, filename, payload) {
   const markerDir = join(cwd, ".codex", "tmp");
   mkdirSync(markerDir, { recursive: true });
   writeFileSync(
-    join(markerDir, "last-test-success.json"),
-    `${JSON.stringify({
-      command,
-      fingerprint: workspaceFingerprint(cwd),
-      timestamp: new Date().toISOString(),
-    }, null, 2)}\n`,
+    join(markerDir, filename),
+    `${JSON.stringify(payload, null, 2)}\n`,
     "utf8",
   );
+}
+
+function recordTestRunMarker(cwd, command, exitCode, passed) {
+  writeMarker(cwd, "last-test-run.json", {
+    command,
+    exitCode,
+    passed,
+    fingerprint: workspaceFingerprint(cwd),
+    timestamp: new Date().toISOString(),
+  });
+}
+
+function recordSuccessMarker(cwd, command) {
+  writeMarker(cwd, "last-test-success.json", {
+    command,
+    fingerprint: workspaceFingerprint(cwd),
+    timestamp: new Date().toISOString(),
+  });
 }
 
 const event = await readEvent();
@@ -29,13 +43,14 @@ const command = commandFromEvent(event);
 const exitCode = event?.tool_response?.exit_code;
 const isMavenTest = isMavenTestCommand(command);
 
-if (isMavenTest && exitCode === 0) {
-  recordSuccessMarker(cwd, command);
-  process.exit(0);
-}
-
-if ((/\bmvn(?:w|\.cmd|w\.cmd)?\b/.test(command) || /[\\/]mvnw(?:\.cmd)?\b/.test(command)) && /\btest\b/.test(command) && exitCode !== undefined && exitCode !== 0) {
-  additionalContext("PostToolUse", "The Maven test command failed. Do not present the work as complete until tests pass or the failure is explicitly documented.");
+if (isMavenTest && typeof exitCode === "number") {
+  const passed = exitCode === 0;
+  recordTestRunMarker(cwd, command, exitCode, passed);
+  if (passed) {
+    recordSuccessMarker(cwd, command);
+    process.exit(0);
+  }
+  additionalContext("PostToolUse", "The Maven test command failed. Do not present the work as complete until tests pass or the failure is explicitly documented in the final response.");
   process.exit(0);
 }
 
