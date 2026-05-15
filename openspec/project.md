@@ -30,8 +30,7 @@ They are intentionally gitignored and should be copied into PR descriptions befo
 
 ## Terms
 
-- **Account**: Aggregate root identified by a service-generated account identifier.
-- **Ledger**: Value object held by one account; it contains accepted transactions and current balance.
+- **AccountLedger**: Aggregate root for one account's currency, balance, and accepted transactions.
 - **Transaction**: Entity representing an accepted deposit or withdrawal.
 - **Balance**: The current account position derived from accepted transactions.
 - **Currency base units**: Integer representation of currency, such as pence for GBP.

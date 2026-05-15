@@ -17,22 +17,25 @@ class MoneyTest {
 
     @Test
     void rejectsNonPositiveAmount() {
-        var exception = assertThrows(InvalidDomainRequestException.class, () -> new Money(0, "GBP"));
+        var exception = assertThrows(LedgerException.class, () -> new Money(0, "GBP"));
 
-        assertEquals("value must be positive", exception.getMessage());
+        assertEquals(LedgerErrorCode.INVALID_AMOUNT, exception.code());
+        assertEquals("Amount value must be positive", exception.getMessage());
     }
 
     @Test
     void rejectsBlankCurrency() {
-        var exception = assertThrows(InvalidDomainRequestException.class, () -> new Money(100, " "));
+        var exception = assertThrows(LedgerException.class, () -> new Money(100, " "));
 
-        assertEquals("currency must not be blank", exception.getMessage());
+        assertEquals(LedgerErrorCode.INVALID_CURRENCY, exception.code());
+        assertEquals("Currency is required", exception.getMessage());
     }
 
     @Test
     void rejectsInvalidCurrencyCode() {
-        var exception = assertThrows(InvalidDomainRequestException.class, () -> new Money(100, "GB"));
+        var exception = assertThrows(LedgerException.class, () -> new Money(100, "GB"));
 
-        assertEquals("currency must be an ISO-style three-letter code", exception.getMessage());
+        assertEquals(LedgerErrorCode.INVALID_CURRENCY, exception.code());
+        assertEquals("Currency must be a three-letter code", exception.getMessage());
     }
 }

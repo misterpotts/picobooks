@@ -5,7 +5,9 @@ import dev.mjkpotts.picobooks.domain.Balance;
 import dev.mjkpotts.picobooks.domain.Transaction;
 import java.util.List;
 
-public interface AccountService {
+public interface LedgerService {
+
+    CreatedAccount createAccount(String currency);
 
     Transaction recordTransaction(AccountId accountId, RecordTransactionInput command);
 
