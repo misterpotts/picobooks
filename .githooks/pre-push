@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -eu
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main)
+      echo "Direct pushes to main are blocked. Push a branch and open a PR for human review." >&2
+      exit 1
+      ;;
+  esac
+done

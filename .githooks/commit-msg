@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+set -eu
+
+message_file="$1"
+subject="$(sed -n '1p' "$message_file")"
+
+case "$subject" in
+  build:\ *|build\(*\):\ *|chore:\ *|chore\(*\):\ *|ci:\ *|ci\(*\):\ *|docs:\ *|docs\(*\):\ *|feat:\ *|feat\(*\):\ *|fix:\ *|fix\(*\):\ *|perf:\ *|perf\(*\):\ *|refactor:\ *|refactor\(*\):\ *|revert:\ *|revert\(*\):\ *|style:\ *|style\(*\):\ *|test:\ *|test\(*\):\ *)
+    ;;
+  *)
+    echo "Commit subject must use Conventional Commits, for example: feat: add ledger movements" >&2
+    exit 1
+    ;;
+esac
+
+awk 'NR > 1 && length($0) > 100 { print "Commit body/footer lines must be <= 100 characters."; exit 1 }' "$message_file"
