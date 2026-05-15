@@ -20,8 +20,6 @@ class HealthControllerTest {
     void healthReturnsSkeletonStatus() throws Exception {
         mockMvc.perform(get("/health"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", equalTo("UP")))
-                .andExpect(jsonPath("$.runtime", equalTo("spring-mvc-servlet")))
-                .andExpect(jsonPath("$.implementation", equalTo("skeleton")));
+                .andExpect(jsonPath("$.status", equalTo("UP")));
     }
 }

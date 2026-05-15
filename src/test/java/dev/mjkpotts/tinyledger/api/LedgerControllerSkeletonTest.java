@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.mjkpotts.tinyledger.application.LedgerService;
+import dev.mjkpotts.tinyledger.application.RecordTransactionInput;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -49,7 +50,7 @@ class LedgerControllerSkeletonTest {
                 @Override
                 public dev.mjkpotts.tinyledger.domain.LedgerEntry recordTransaction(
                         dev.mjkpotts.tinyledger.domain.AccountId accountId,
-                        dev.mjkpotts.tinyledger.application.RecordTransactionCommand command
+                        RecordTransactionInput command
                 ) {
                     throw new UnsupportedOperationException("Ledger implementation intentionally left as a skeleton for Codex-assisted development.");
                 }

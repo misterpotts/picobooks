@@ -7,12 +7,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-final class SkeletonLedgerService implements LedgerService {
+final class DefaultLedgerService implements LedgerService {
 
     private static final String MESSAGE = "Ledger implementation intentionally left as a skeleton for Codex-assisted development.";
 
     @Override
-    public LedgerEntry recordTransaction(AccountId accountId, RecordTransactionCommand command) {
+    public LedgerEntry recordTransaction(AccountId accountId, RecordTransactionInput command) {
         throw new UnsupportedOperationException(MESSAGE);
     }
 

@@ -1,6 +1,6 @@
 package dev.mjkpotts.tinyledger.api;
 
-import dev.mjkpotts.tinyledger.application.RecordTransactionCommand;
+import dev.mjkpotts.tinyledger.application.RecordTransactionInput;
 import dev.mjkpotts.tinyledger.domain.Money;
 import dev.mjkpotts.tinyledger.domain.TransactionType;
 import jakarta.validation.Valid;
@@ -12,7 +12,7 @@ record RecordTransactionRequest(
         String reference
 ) {
 
-    RecordTransactionCommand toCommand() {
-        return new RecordTransactionCommand(type, new Money(amount.amountMinor(), amount.currency()), reference);
+    RecordTransactionInput toCommand() {
+        return new RecordTransactionInput(type, new Money(amount.amountMinor(), amount.currency()), reference);
     }
 }
