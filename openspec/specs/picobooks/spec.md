@@ -4,6 +4,9 @@
 
 The service SHALL expose a small JSON HTTP API for account-scoped ledger operations.
 
+In this spec, "transaction" means an accepted business ledger movement, not a database transaction,
+unless explicitly qualified otherwise.
+
 ### `GET /health`
 
 Returns service health.
@@ -112,8 +115,27 @@ Returns accepted transactions for one existing account in append order with HTTP
 
 ### Error Responses
 
-Invalid client requests return HTTP `400 Bad Request` with a stable error body. Error codes SHALL be
-specific enough for clients to act without parsing message text.
+Error responses return a stable body. Error codes SHALL be specific enough for clients to act
+without parsing message text.
+
+Malformed or invalid-shape client requests return HTTP `400 Bad Request`:
+
+```json
+{
+  "code": "invalid_amount",
+  "message": "Amount value must be positive",
+  "occurredAt": "2026-05-15T12:00:00Z"
+}
+```
+
+Recognized bad-request error codes include:
+
+- `invalid_account_id`
+- `invalid_amount`
+- `invalid_currency`
+- `invalid_transaction_type`
+
+Valid-shape ledger requests rejected by account state return HTTP `409 Conflict`:
 
 ```json
 {
@@ -123,15 +145,11 @@ specific enough for clients to act without parsing message text.
 }
 ```
 
-Recognized ledger error codes include:
+Recognized conflict error codes include:
 
 - `account_not_found`
 - `currency_mismatch`
 - `insufficient_funds`
-- `invalid_account_id`
-- `invalid_amount`
-- `invalid_currency`
-- `invalid_transaction_type`
 
 ## Wire Rules
 
@@ -358,9 +376,9 @@ Each `Transaction` stores the resulting balance after that transaction is accept
 insufficient-funds rejection requires transactionality and ordering for each account so concurrent
 withdrawals cannot both observe the same old balance and overdraw the account.
 
-The latest entry's `resultingBalance` is authoritative for reads, which avoids replaying the full
-entry list for every balance request. This introduces contention only inside one account aggregate;
-there is no global ledger lock or cross-account balance owner.
+The latest transaction's `resultingBalance` is authoritative for reads, which avoids replaying the
+full transaction list for every balance request. This introduces contention only inside one account
+aggregate; there is no global ledger lock or cross-account balance owner.
 
 ### In-Memory Data Model
 
