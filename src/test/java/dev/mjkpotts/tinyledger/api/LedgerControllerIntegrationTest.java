@@ -17,8 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(LedgerController.class)
-@Import({ApiExceptionHandler.class, LedgerControllerSkeletonTest.TestLedgerServiceConfiguration.class})
-class LedgerControllerSkeletonTest {
+@Import({ApiExceptionHandler.class, LedgerControllerIntegrationTest.TestLedgerServiceConfiguration.class})
+class LedgerControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
