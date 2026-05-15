@@ -9,7 +9,8 @@ Use this skill as a lifecycle checklist for Picobooks domain work. Keep Spring M
 DTOs, validation annotations, configuration, and framework wiring pragmatic at boundaries; apply
 stricter object-design scrutiny to domain and application code.
 
-This skill complements `$pr-driven-delivery`; it does not replace branch, commit, PR, or gate rules.
+This skill complements `$pr-driven-delivery`, `$review-delivery-plan`, and
+`$review-implementation`; it does not replace branch, commit, PR, or gate rules.
 
 ## Workflow
 
@@ -31,6 +32,9 @@ numbers, environment state, or real repositories unless the seam itself is under
 
 Read `references/domain-driven-design.md` when the main uncertainty is terminology, aggregate
 boundaries, or whether a concept is an entity, value object, or service.
+
+During plan review, require the proposed plan to identify the domain concepts, aggregate or service
+boundaries, behavior placement, and unit-test seams for domain/application changes.
 
 ### Implementation
 
@@ -74,3 +78,6 @@ that exist only so another class can make domain decisions.
 
 Check whether any EO, DDD, or testability compromise is explicit and local. Accept pragmatic Spring
 boundary code, but require a short rationale for compromises inside domain/application code.
+
+During implementation review, classify domain/object-design concerns as blocking when they make the
+domain behavior ambiguous, hard to test without Spring, or dependent on hidden global state.

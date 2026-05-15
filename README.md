@@ -23,10 +23,13 @@ All non-trivial changes should go through a pull request.
 Contributors and agents should:
 
 1. create a short-lived non-main branch;
-2. make the smallest coherent change;
-3. use Conventional Commit messages;
-4. open a non-draft pull request with a Conventional Commit title;
-5. leave merge decisions to human review.
+2. plan the change before editing tracked files;
+3. get an independent plan review and iterate until there is no blocking feedback;
+4. make the smallest coherent change;
+5. get an independent implementation review and iterate until there is no blocking feedback;
+6. use Conventional Commit messages;
+7. open a non-draft pull request with a Conventional Commit title;
+8. leave merge decisions to human review.
 
 ## Codex Harness
 
@@ -35,7 +38,7 @@ The initial Codex harness lives under `.codex/` and provides repo-local governan
 - project-scoped Codex configuration;
 - command hooks for unsafe actions, PR workflow checks, and completion gates;
 - repository execution rules;
-- a PR-driven delivery skill for consistent agent behaviour.
+- repo-local skills for PR-driven delivery, plan review, implementation review, and domain object testability.
 
 Agents may open and update PRs for review, but they must not merge them.
 

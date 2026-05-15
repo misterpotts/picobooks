@@ -20,6 +20,8 @@ Use Codex and other agents as governed engineering assistants. Keep intent revie
 ## PR-Driven Workflow
 
 - Do all non-trivial work on a non-main branch.
+- Follow the staged agent workflow: plan, independently review the plan, iterate until there is no blocking feedback, implement, independently review the implementation, and iterate until there is no blocking feedback.
+- Use the repo-local `$pr-driven-delivery` skill for repository changes, `$review-delivery-plan` for plan review, `$review-implementation` for implementation review, and `$domain-object-testability` when domain or application modeling is involved.
 - Open a pull request for review before merging.
 - Agents may create and edit non-draft PRs, but must not merge PRs or approve their own work.
 - Do not push directly to `main`.

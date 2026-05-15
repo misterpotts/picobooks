@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Delivery Plan"
+  short_description: "Review staged delivery plans"
+  default_prompt: "Use $review-delivery-plan to review a proposed repository change plan for blocking feedback."

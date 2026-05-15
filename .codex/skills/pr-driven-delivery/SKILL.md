@@ -1,6 +1,6 @@
 ---
 name: pr-driven-delivery
-description: Use for this repository when planning, implementing, reviewing, releasing, creating or editing PRs, writing commits, or responding to review comments. Enforces branch-based delivery, Conventional Commit messages and PR titles, short commit bodies, non-draft PRs, local gates, and human review before merge.
+description: Use for this repository when planning, reviewing plans, implementing, reviewing implementations, releasing, creating or editing PRs, writing commits, or responding to review comments. Enforces staged plan-review-implement-review delivery, branch-based delivery, Conventional Commit messages and PR titles, short commit bodies, non-draft PRs, local gates, and human review before merge.
 ---
 
 # PR-Driven Delivery
@@ -10,12 +10,32 @@ Use this skill for repository changes in this project.
 ## Required Workflow
 
 1. Work on a non-main branch.
-2. For behaviour changes, create or update a local OpenSpec delta and later copy it into the PR body.
-3. Implement the smallest useful change, keeping README examples and `openspec/specs/**` aligned.
-4. Run available quality gates before release. At minimum, Maven verification and commitlint must pass in CI.
-5. Commit with Conventional Commits only.
-6. Open or update a non-draft PR with a Conventional Commit title.
-7. Stop before merge; human review and merge are required.
+2. Produce a concrete implementation plan before editing tracked files.
+3. Get an independent plan review with `$review-delivery-plan`.
+4. Iterate on the plan until the reviewer verdict is `no blocking feedback`.
+5. Implement the smallest useful change.
+6. Get an independent implementation review with `$review-implementation`.
+7. Iterate on the implementation until the reviewer verdict is `no blocking feedback`.
+8. Run available quality gates before release. At minimum, Maven verification and commitlint must pass in CI.
+9. Commit with Conventional Commits only.
+10. Open or update a non-draft PR with a Conventional Commit title.
+11. Stop before merge; human review and merge are required.
+
+## Stage Rules
+
+- Treat plan review and implementation review as required agent review gates before PR release.
+- Use `$domain-object-testability` during planning, implementation, and review when domain or application modeling changes.
+- For behaviour changes, create or update a local OpenSpec delta before implementation, then copy the delta into the PR body and keep accepted `openspec/specs/**` aligned.
+- Do not begin implementation while plan review has blocking feedback.
+- Do not create or update a PR while implementation review has blocking feedback.
+- Human PR review remains the final acceptance boundary; agent review is not merge approval.
+
+## Agent Roles
+
+- Planner/implementer: use `$pr-driven-delivery`, plus domain or task-specific skills needed for the change.
+- Plan reviewer: use `$review-delivery-plan`; review the plan only and report blocking feedback.
+- Implementation reviewer: use `$review-implementation`; review the diff and verification evidence only.
+- Human reviewer: review the PR and decide merge readiness.
 
 ## Commit Rules
 

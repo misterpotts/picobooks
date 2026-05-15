@@ -6,6 +6,8 @@ import { test } from "node:test";
 const repoRoot = resolve(import.meta.dirname, "..", "..");
 const skillRoot = join(repoRoot, ".codex", "skills", "pr-driven-delivery");
 const domainSkillRoot = join(repoRoot, ".codex", "skills", "domain-object-testability");
+const planReviewSkillRoot = join(repoRoot, ".codex", "skills", "review-delivery-plan");
+const implementationReviewSkillRoot = join(repoRoot, ".codex", "skills", "review-implementation");
 
 test("pr-driven-delivery skill has required frontmatter and workflow terms", () => {
   const skillPath = join(skillRoot, "SKILL.md");
@@ -14,6 +16,7 @@ test("pr-driven-delivery skill has required frontmatter and workflow terms", () 
   const text = readFileSync(skillPath, "utf8").replace(/\r\n/g, "\n");
   assert.match(text, /^---\nname: pr-driven-delivery\n/s);
   assert.match(text, /description: .*Conventional Commit/s);
+  assert.match(text, /staged plan-review-implement-review delivery/);
   assert.match(text, /non-main branch/);
   assert.match(text, /draft PR/);
   assert.match(text, /Do not run `gh pr merge`/);
@@ -41,6 +44,20 @@ test("pr-driven-delivery skill includes a comprehensive terse PR template", () =
   assert.match(text, /## Assumptions and Trade-offs/);
   assert.match(text, /## AI Assistance Disclosure/);
   assert.match(text, /Keep each section concise/);
+});
+
+test("pr-driven-delivery requires staged agent review before release", () => {
+  const skillPath = join(skillRoot, "SKILL.md");
+  const text = readFileSync(skillPath, "utf8");
+
+  assert.match(text, /Produce a concrete implementation plan before editing tracked files/);
+  assert.match(text, /Get an independent plan review with `\$review-delivery-plan`/);
+  assert.match(text, /reviewer verdict is `no blocking feedback`/);
+  assert.match(text, /Get an independent implementation review with `\$review-implementation`/);
+  assert.match(text, /Do not begin implementation while plan review has blocking feedback/);
+  assert.match(text, /Do not create or update a PR while implementation review has blocking feedback/);
+  assert.match(text, /Human PR review remains the final acceptance boundary/);
+  assert.match(text, /Use `\$domain-object-testability`/);
 });
 
 test("domain-object-testability skill has required frontmatter and metadata", () => {
@@ -89,6 +106,10 @@ test("domain-object-testability skill covers the full domain change lifecycle", 
   assert.match(text, /Spring pragmatism/);
   assert.match(text, /domain behavior stayed inside domain objects/);
   assert.match(text, /explicit and local/);
+  assert.match(text, /\$review-delivery-plan/);
+  assert.match(text, /\$review-implementation/);
+  assert.match(text, /During plan review/);
+  assert.match(text, /During implementation review/);
 });
 
 test("domain-object-testability skill includes focused primary-source references", () => {
@@ -118,6 +139,57 @@ test("domain-object-testability skill includes focused primary-source references
   assert.match(domainDrivenDesign, /martinfowler\.com\/bliki\/DomainDrivenDesign/);
   assert.match(domainDrivenDesign, /bounded context/);
   assert.match(domainDrivenDesign, /ubiquitous language/);
+});
+
+test("review-delivery-plan skill defines the plan reviewer persona", () => {
+  const skillPath = join(planReviewSkillRoot, "SKILL.md");
+  assert.equal(existsSync(skillPath), true);
+
+  const text = readFileSync(skillPath, "utf8").replace(/\r\n/g, "\n");
+  assert.match(text, /^---\nname: review-delivery-plan\n/s);
+  assert.match(text, /description: .*review a proposed plan before implementation/s);
+  assert.match(text, /plan -> review plan -> implement -> review implementation/);
+  assert.match(text, /Review the plan only/);
+  assert.match(text, /intent and scope/);
+  assert.match(text, /repository constraints/);
+  assert.match(text, /implementation readiness/);
+  assert.match(text, /skill coverage/);
+  assert.match(text, /\$pr-driven-delivery/);
+  assert.match(text, /\$domain-object-testability/);
+  assert.match(text, /## Blocking Feedback/);
+  assert.match(text, /## Non-blocking Notes/);
+  assert.match(text, /## Verdict/);
+  assert.match(text, /no blocking feedback/);
+  assert.match(text, /blocking feedback/);
+
+  const metadata = readFileSync(join(planReviewSkillRoot, "agents", "openai.yaml"), "utf8");
+  assert.match(metadata, /display_name: "Review Delivery Plan"/);
+  assert.match(metadata, /default_prompt: "Use \$review-delivery-plan/);
+});
+
+test("review-implementation skill defines the implementation reviewer persona", () => {
+  const skillPath = join(implementationReviewSkillRoot, "SKILL.md");
+  assert.equal(existsSync(skillPath), true);
+
+  const text = readFileSync(skillPath, "utf8").replace(/\r\n/g, "\n");
+  assert.match(text, /^---\nname: review-implementation\n/s);
+  assert.match(text, /description: .*review completed repository changes before PR creation or update/s);
+  assert.match(text, /plan -> review plan -> implement -> review implementation/);
+  assert.match(text, /Review the implemented changes and verification evidence/);
+  assert.match(text, /intent fit/);
+  assert.match(text, /correctness and maintainability/);
+  assert.match(text, /repository constraints/);
+  assert.match(text, /verification/);
+  assert.match(text, /\$domain-object-testability/);
+  assert.match(text, /## Blocking Feedback/);
+  assert.match(text, /## Non-blocking Notes/);
+  assert.match(text, /## Verdict/);
+  assert.match(text, /no blocking feedback/);
+  assert.match(text, /blocking feedback/);
+
+  const metadata = readFileSync(join(implementationReviewSkillRoot, "agents", "openai.yaml"), "utf8");
+  assert.match(metadata, /display_name: "Review Implementation"/);
+  assert.match(metadata, /default_prompt: "Use \$review-implementation/);
 });
 
 test("local workflow uses git hooks without a repo package.json", () => {
