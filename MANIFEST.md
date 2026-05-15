@@ -10,6 +10,15 @@
 - `.codex/rules/default.rules`
 - `.codex/skills/pr-driven-delivery/SKILL.md`
 - `.codex/skills/pr-driven-delivery/agents/openai.yaml`
+- `.codex/skills/domain-object-testability/SKILL.md`
+- `.codex/skills/domain-object-testability/agents/openai.yaml`
+- `.codex/skills/domain-object-testability/references/domain-driven-design.md`
+- `.codex/skills/domain-object-testability/references/elegant-objects.md`
+- `.codex/skills/domain-object-testability/references/testability.md`
+- `.codex/skills/review-delivery-plan/SKILL.md`
+- `.codex/skills/review-delivery-plan/agents/openai.yaml`
+- `.codex/skills/review-implementation/SKILL.md`
+- `.codex/skills/review-implementation/agents/openai.yaml`
 - `.githooks/commit-msg`
 - `.githooks/pre-push`
 - `.gitattributes`

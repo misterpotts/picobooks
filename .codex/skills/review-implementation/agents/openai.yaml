@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Implementation"
+  short_description: "Review implementation diffs"
+  default_prompt: "Use $review-implementation to review a completed repository implementation for blocking feedback."

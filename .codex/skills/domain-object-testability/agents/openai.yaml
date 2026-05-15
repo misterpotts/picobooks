@@ -1,0 +1,4 @@
+interface:
+  display_name: "Domain Object Testability"
+  short_description: "Design testable domain objects"
+  default_prompt: "Use $domain-object-testability to plan, implement, or review testable Java domain changes."
