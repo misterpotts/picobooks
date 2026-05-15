@@ -12,17 +12,26 @@ import {
   writeJson,
 } from "./hook_utils.mjs";
 
-function validTestMarker(cwd) {
-  const markerPath = join(cwd, ".codex", "tmp", "last-test-success.json");
+function readMarker(cwd, filename) {
+  const markerPath = join(cwd, ".codex", "tmp", filename);
   if (!existsSync(markerPath)) {
-    return false;
+    return null;
   }
   try {
-    const marker = JSON.parse(readFileSync(markerPath, "utf8"));
-    return marker.fingerprint === workspaceFingerprint(cwd);
+    return JSON.parse(readFileSync(markerPath, "utf8"));
   } catch {
-    return false;
+    return null;
   }
+}
+
+function hasCurrentTestRun(cwd) {
+  const fingerprint = workspaceFingerprint(cwd);
+  const success = readMarker(cwd, "last-test-success.json");
+  if (success && success.fingerprint === fingerprint) {
+    return true;
+  }
+  const run = readMarker(cwd, "last-test-run.json");
+  return Boolean(run && run.fingerprint === fingerprint);
 }
 
 const event = await readEvent();
@@ -45,8 +54,8 @@ if (constraintViolations.length > 0) {
 }
 
 const relevantFiles = relevantChangedFiles(cwd);
-if (relevantFiles.length > 0 && !validTestMarker(cwd)) {
-  blockStop("Relevant files changed but no current successful `mvn test` marker exists for this workspace state. Run `mvn test` after the latest relevant edits, or explicitly document why it cannot be run.");
+if (relevantFiles.length > 0 && !hasCurrentTestRun(cwd)) {
+  blockStop("Relevant files changed but `mvn test` has not been run after the latest relevant edits. Run `mvn test` for the current workspace state; the response may complete on either a pass or a documented failure.");
   process.exit(0);
 }
 
