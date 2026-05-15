@@ -6,7 +6,7 @@ public record TransactionId(UUID value) {
 
     public TransactionId {
         if (value == null || value.version() != 7) {
-            throw new IllegalArgumentException("transactionId must be a UUID v7 value");
+            throw new LedgerException(LedgerErrorCode.INVALID_TRANSACTION_ID, "transactionId must be a UUID v7 value");
         }
     }
 

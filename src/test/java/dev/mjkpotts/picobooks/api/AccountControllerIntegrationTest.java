@@ -169,6 +169,24 @@ class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.code", equalTo("invalid_transaction_type")));
     }
 
+    @Test
+    void malformedJsonReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/accounts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code", equalTo("invalid_request")));
+    }
+
+    @Test
+    void jsonNullRequestBodyReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/accounts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("null"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code", equalTo("invalid_request")));
+    }
+
     private String createAccount(String currency) throws Exception {
         var result = mockMvc.perform(post("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)

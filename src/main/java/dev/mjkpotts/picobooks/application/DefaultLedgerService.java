@@ -40,7 +40,7 @@ final class DefaultLedgerService implements LedgerService {
     @Override
     public Transaction recordTransaction(AccountId accountId, RecordTransactionInput command) {
         if (command == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_AMOUNT, "Transaction amount is required");
+            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Transaction payload is required");
         }
         return repository.update(accountId, ledger -> ledger.record(
                 command.type(),

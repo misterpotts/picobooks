@@ -2,6 +2,8 @@ package dev.mjkpotts.picobooks.api;
 
 import dev.mjkpotts.picobooks.application.LedgerService;
 import dev.mjkpotts.picobooks.domain.AccountId;
+import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
+import dev.mjkpotts.picobooks.domain.LedgerException;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +25,8 @@ final class AccountController {
 
     @PostMapping
     ResponseEntity<CreateAccountResponse> createAccount(@RequestBody CreateAccountRequest request) {
-        var account = ledgerService.createAccount(request == null ? null : request.currency());
+        var accountRequest = requireRequest(request);
+        var account = ledgerService.createAccount(accountRequest.currency());
         return ResponseEntity.status(201).body(CreateAccountResponse.from(account));
     }
 
@@ -32,7 +35,8 @@ final class AccountController {
             @PathVariable String accountId,
             @RequestBody RecordTransactionRequest request
     ) {
-        var transaction = ledgerService.recordTransaction(new AccountId(accountId), request == null ? null : request.toCommand());
+        var transactionRequest = requireRequest(request);
+        var transaction = ledgerService.recordTransaction(new AccountId(accountId), transactionRequest.toCommand());
         return ResponseEntity.status(201).body(TransactionResponse.from(transaction));
     }
 
@@ -48,5 +52,19 @@ final class AccountController {
                 .stream()
                 .map(TransactionResponse::from)
                 .toList();
+    }
+
+    private static CreateAccountRequest requireRequest(CreateAccountRequest request) {
+        if (request == null) {
+            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Request body is required");
+        }
+        return request;
+    }
+
+    private static RecordTransactionRequest requireRequest(RecordTransactionRequest request) {
+        if (request == null) {
+            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Request body is required");
+        }
+        return request;
     }
 }

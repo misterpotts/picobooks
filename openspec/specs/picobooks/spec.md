@@ -135,6 +135,8 @@ Recognized bad-request error codes include:
 - `invalid_account_id`
 - `invalid_amount`
 - `invalid_currency`
+- `invalid_request`
+- `invalid_transaction_id`
 - `invalid_transaction_type`
 
 Valid-shape ledger requests rejected by account state return HTTP `409 Conflict`:

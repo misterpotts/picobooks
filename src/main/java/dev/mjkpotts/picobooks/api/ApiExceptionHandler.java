@@ -1,5 +1,6 @@
 package dev.mjkpotts.picobooks.api;
 
+import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
 import dev.mjkpotts.picobooks.domain.LedgerException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +23,12 @@ final class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ApiError validationFailure(MethodArgumentNotValidException exception) {
-        return ApiError.of("invalid_request", "Request validation failed");
+        return ApiError.of(LedgerErrorCode.INVALID_REQUEST.wireCode(), "Request validation failed");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ApiError unreadableMessage(HttpMessageNotReadableException exception) {
-        return ApiError.of("invalid_request", "Request body is invalid");
+        return ApiError.of(LedgerErrorCode.INVALID_REQUEST.wireCode(), "Request body is invalid");
     }
 }
