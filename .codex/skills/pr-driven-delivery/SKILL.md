@@ -12,7 +12,7 @@ Use this skill for repository changes in this project.
 1. Work on a non-main branch.
 2. For behaviour changes, create or update a local OpenSpec delta and later copy it into the PR body.
 3. Implement the smallest useful change, keeping README examples and `openspec/specs/**` aligned.
-4. Run available quality gates before release. At minimum, PR title and commit messages must pass commitlint in CI.
+4. Run available quality gates before release. At minimum, Maven verification and commitlint must pass in CI.
 5. Commit with Conventional Commits only.
 6. Open or update a non-draft PR with a Conventional Commit title.
 7. Stop before merge; human review and merge are required.
@@ -25,7 +25,7 @@ Use this skill for repository changes in this project.
 - Omit commit bodies for simple changes.
 - When a body is needed, keep it short and factual; wrap body/footer lines at 100 characters.
 - Install local git hooks with `scripts/install-git-hooks.sh` when hooks are not already configured.
-- CI runs commitlint against PR commits and the PR title.
+- CI runs Maven verification, commitlint against PR commits, and commitlint against the PR title.
 
 ## PR Rules
 
@@ -59,7 +59,7 @@ Use the following template when writing a PR description body. Keep each section
 ## Verification
 <!-- List commands run and relevant manual checks. Include failures or skipped checks with reasons. -->
 
-- [ ] `mvn test`
+- [ ] `mvn verify`
 - [ ] `node --test tests/hooks/codex-hooks.test.mjs tests/skills/skill-config.test.mjs`
 - [ ] `node .codex/hooks/check_repository_constraints.mjs`
 

@@ -126,7 +126,20 @@ test("permission request hook denies system package installs", () => {
   assert.equal(payload.hookSpecificOutput.decision.behavior, "deny");
 });
 
-test("post hook records a content-addressed Maven test marker", () => {
+test("post hook records a content-addressed Maven verify marker", () => {
+  const dir = makeRepo();
+  runHook("post_tool_use_review.mjs", {
+    cwd: dir,
+    tool_input: { command: "mvn verify" },
+    tool_response: { exit_code: 0 },
+  }, dir);
+
+  const marker = JSON.parse(readFileSync(join(dir, ".codex", "tmp", "last-test-success.json"), "utf8"));
+  assert.equal(marker.command, "mvn verify");
+  assert.match(marker.fingerprint, /^[a-f0-9]{64}$/);
+});
+
+test("post hook does not treat Maven test as the verification gate", () => {
   const dir = makeRepo();
   runHook("post_tool_use_review.mjs", {
     cwd: dir,
@@ -134,16 +147,27 @@ test("post hook records a content-addressed Maven test marker", () => {
     tool_response: { exit_code: 0 },
   }, dir);
 
-  const marker = JSON.parse(readFileSync(join(dir, ".codex", "tmp", "last-test-success.json"), "utf8"));
-  assert.equal(marker.command, "mvn test");
-  assert.match(marker.fingerprint, /^[a-f0-9]{64}$/);
+  const result = spawnSync("git", ["status", "--porcelain=v1", ".codex/tmp/last-test-success.json"], { cwd: dir, encoding: "utf8", windowsHide: true });
+  assert.equal(result.stdout.trim(), "");
 });
 
-test("post hook does not treat echoed Maven text as a test run", () => {
+test("post hook does not accept Maven verification when tests are skipped", () => {
   const dir = makeRepo();
   runHook("post_tool_use_review.mjs", {
     cwd: dir,
-    tool_input: { command: "echo mvn test" },
+    tool_input: { command: "mvn verify -DskipTests" },
+    tool_response: { exit_code: 0 },
+  }, dir);
+
+  const result = spawnSync("git", ["status", "--porcelain=v1", ".codex/tmp/last-test-success.json"], { cwd: dir, encoding: "utf8", windowsHide: true });
+  assert.equal(result.stdout.trim(), "");
+});
+
+test("post hook does not treat echoed Maven text as a verification run", () => {
+  const dir = makeRepo();
+  runHook("post_tool_use_review.mjs", {
+    cwd: dir,
+    tool_input: { command: "echo mvn verify" },
     tool_response: { exit_code: 0 },
   }, dir);
 
@@ -155,7 +179,7 @@ test("stop hook rejects stale Maven markers after relevant edits", () => {
   const dir = makeRepo();
   runHook("post_tool_use_review.mjs", {
     cwd: dir,
-    tool_input: { command: "mvn test" },
+    tool_input: { command: "mvn verify" },
     tool_response: { exit_code: 0 },
   }, dir);
 
@@ -163,19 +187,19 @@ test("stop hook rejects stale Maven markers after relevant edits", () => {
   const payload = runHook("stop_quality_gate.mjs", { cwd: dir }, dir);
 
   assert.equal(payload.decision, "block");
-  assert.match(payload.reason, /`mvn test` has not been run after the latest relevant edits/);
+  assert.match(payload.reason, /`mvn verify` has not been run after the latest relevant edits/);
 });
 
-test("post hook records a Maven test run marker on failure", () => {
+test("post hook records a Maven verify run marker on failure", () => {
   const dir = makeRepo();
   runHook("post_tool_use_review.mjs", {
     cwd: dir,
-    tool_input: { command: "mvn test" },
+    tool_input: { command: "mvn verify" },
     tool_response: { exit_code: 1 },
   }, dir);
 
   const marker = JSON.parse(readFileSync(join(dir, ".codex", "tmp", "last-test-run.json"), "utf8"));
-  assert.equal(marker.command, "mvn test");
+  assert.equal(marker.command, "mvn verify");
   assert.equal(marker.exitCode, 1);
   assert.equal(marker.passed, false);
   assert.match(marker.fingerprint, /^[a-f0-9]{64}$/);
@@ -186,7 +210,7 @@ test("stop hook allows a failed Maven run that matches the current workspace", (
   writeFileSync(join(dir, "README.md"), "edit before failing test run\n");
   runHook("post_tool_use_review.mjs", {
     cwd: dir,
-    tool_input: { command: "mvn test" },
+    tool_input: { command: "mvn verify" },
     tool_response: { exit_code: 1 },
   }, dir);
 
@@ -200,14 +224,14 @@ test("stop hook rejects a stale failed Maven run after later relevant edits", ()
   writeFileSync(join(dir, "README.md"), "first change\n");
   runHook("post_tool_use_review.mjs", {
     cwd: dir,
-    tool_input: { command: "mvn test" },
+    tool_input: { command: "mvn verify" },
     tool_response: { exit_code: 1 },
   }, dir);
 
   writeFileSync(join(dir, "README.md"), "second change after failed test\n");
   const payload = runHook("stop_quality_gate.mjs", { cwd: dir }, dir);
   assert.equal(payload.decision, "block");
-  assert.match(payload.reason, /`mvn test` has not been run after the latest relevant edits/);
+  assert.match(payload.reason, /`mvn verify` has not been run after the latest relevant edits/);
 });
 
 test("stop hook rejects reactive dependencies", () => {

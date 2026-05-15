@@ -55,7 +55,7 @@ if (constraintViolations.length > 0) {
 
 const relevantFiles = relevantChangedFiles(cwd);
 if (relevantFiles.length > 0 && !hasCurrentTestRun(cwd)) {
-  blockStop("Relevant files changed but `mvn test` has not been run after the latest relevant edits. Run `mvn test` for the current workspace state; the response may complete on either a pass or a documented failure.");
+  blockStop("Relevant files changed but `mvn verify` has not been run after the latest relevant edits. Run `mvn verify` for the current workspace state; the response may complete on either a pass or a documented failure.");
   process.exit(0);
 }
 

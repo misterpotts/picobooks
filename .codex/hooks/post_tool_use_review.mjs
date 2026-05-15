@@ -4,7 +4,7 @@ import { join } from "node:path";
 import {
   additionalContext,
   commandFromEvent,
-  isMavenTestCommand,
+  isMavenVerifyCommand,
   readEvent,
   workspaceFingerprint,
 } from "./hook_utils.mjs";
@@ -41,16 +41,16 @@ const event = await readEvent();
 const cwd = String(event.cwd ?? process.cwd());
 const command = commandFromEvent(event);
 const exitCode = event?.tool_response?.exit_code;
-const isMavenTest = isMavenTestCommand(command);
+const isMavenVerify = isMavenVerifyCommand(command);
 
-if (isMavenTest && typeof exitCode === "number") {
+if (isMavenVerify && typeof exitCode === "number") {
   const passed = exitCode === 0;
   recordTestRunMarker(cwd, command, exitCode, passed);
   if (passed) {
     recordSuccessMarker(cwd, command);
     process.exit(0);
   }
-  additionalContext("PostToolUse", "The Maven test command failed. Do not present the work as complete until tests pass or the failure is explicitly documented in the final response.");
+  additionalContext("PostToolUse", "The Maven verification command failed. Do not present the work as complete until tests and coverage pass or the failure is explicitly documented in the final response.");
   process.exit(0);
 }
 
