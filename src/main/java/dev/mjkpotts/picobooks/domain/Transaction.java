@@ -3,12 +3,12 @@ package dev.mjkpotts.picobooks.domain;
 import java.time.Instant;
 import java.util.UUID;
 
-public record LedgerEntry(
+public record Transaction(
         UUID transactionId,
         AccountId accountId,
         TransactionType type,
         Money amount,
-        Money resultingBalance,
+        Balance resultingBalance,
         String reference,
         Instant occurredAt
 ) {

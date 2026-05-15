@@ -7,11 +7,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import dev.mjkpotts.picobooks.application.LedgerService;
+import dev.mjkpotts.picobooks.application.AccountService;
 import dev.mjkpotts.picobooks.application.RecordTransactionInput;
 import dev.mjkpotts.picobooks.domain.AccountId;
-import dev.mjkpotts.picobooks.domain.LedgerEntry;
+import dev.mjkpotts.picobooks.domain.Balance;
 import dev.mjkpotts.picobooks.domain.Money;
+import dev.mjkpotts.picobooks.domain.Transaction;
 import dev.mjkpotts.picobooks.domain.TransactionType;
 import java.time.Instant;
 import java.util.List;
@@ -25,9 +26,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(LedgerController.class)
-@Import({ApiExceptionHandler.class, LedgerControllerIntegrationTest.TestLedgerServiceConfiguration.class})
-class LedgerControllerIntegrationTest {
+@WebMvcTest(AccountController.class)
+@Import({ApiExceptionHandler.class, AccountControllerIntegrationTest.TestAccountServiceConfiguration.class})
+class AccountControllerIntegrationTest {
 
     private static final UUID TRANSACTION_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private static final Instant OCCURRED_AT = Instant.parse("2026-05-15T12:00:00Z");
@@ -36,14 +37,14 @@ class LedgerControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void recordTransactionReturnsNotImplementedUntilLedgerIsBuilt() throws Exception {
+    void recordTransactionReturnsNotImplementedUntilAccountIsBuilt() throws Exception {
         mockMvc.perform(post("/accounts/merchant-123/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "type": "DEPOSIT",
                                   "amount": {
-                                    "amountMinor": 10000,
+                                    "value": 10000,
                                     "currency": "GBP"
                                   },
                                   "reference": "not-implemented"
@@ -54,14 +55,14 @@ class LedgerControllerIntegrationTest {
     }
 
     @Test
-    void recordTransactionReturnsCreatedEntry() throws Exception {
+    void recordTransactionReturnsCreatedTransaction() throws Exception {
         mockMvc.perform(post("/accounts/merchant-123/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "type": "DEPOSIT",
                                   "amount": {
-                                    "amountMinor": 10000,
+                                    "value": 10000,
                                     "currency": "gbp"
                                   },
                                   "reference": "Initial deposit"
@@ -71,9 +72,9 @@ class LedgerControllerIntegrationTest {
                 .andExpect(jsonPath("$.transactionId", equalTo(TRANSACTION_ID.toString())))
                 .andExpect(jsonPath("$.accountId", equalTo("merchant-123")))
                 .andExpect(jsonPath("$.type", equalTo("DEPOSIT")))
-                .andExpect(jsonPath("$.amount.amountMinor", equalTo(10000)))
+                .andExpect(jsonPath("$.amount.value", equalTo(10000)))
                 .andExpect(jsonPath("$.amount.currency", equalTo("GBP")))
-                .andExpect(jsonPath("$.resultingBalance.amountMinor", equalTo(10000)))
+                .andExpect(jsonPath("$.resultingBalance.value", equalTo(10000)))
                 .andExpect(jsonPath("$.resultingBalance.currency", equalTo("GBP")))
                 .andExpect(jsonPath("$.reference", equalTo("Initial deposit")))
                 .andExpect(jsonPath("$.occurredAt", equalTo("2026-05-15T12:00:00Z")));
@@ -84,12 +85,12 @@ class LedgerControllerIntegrationTest {
         mockMvc.perform(get("/accounts/merchant-123/balance"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountId", equalTo("merchant-123")))
-                .andExpect(jsonPath("$.balance.amountMinor", equalTo(12500)))
+                .andExpect(jsonPath("$.balance.value", equalTo(12500)))
                 .andExpect(jsonPath("$.balance.currency", equalTo("GBP")));
     }
 
     @Test
-    void historyReturnsLedgerEntries() throws Exception {
+    void historyReturnsTransactions() throws Exception {
         mockMvc.perform(get("/accounts/merchant-123/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -106,7 +107,7 @@ class LedgerControllerIntegrationTest {
                                 {
                                   "type": "DEPOSIT",
                                   "amount": {
-                                    "amountMinor": 0,
+                                    "value": 0,
                                     "currency": "GBP"
                                   }
                                 }
@@ -123,51 +124,51 @@ class LedgerControllerIntegrationTest {
                                 {
                                   "type": "DEPOSIT",
                                   "amount": {
-                                    "amountMinor": 10000,
+                                    "value": 10000,
                                     "currency": "GB"
                                   }
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo("invalid_ledger_request")));
+                .andExpect(jsonPath("$.code", equalTo("invalid_request")));
     }
 
     @TestConfiguration(proxyBeanMethods = false)
-    static class TestLedgerServiceConfiguration {
+    static class TestAccountServiceConfiguration {
 
         @Bean
-        LedgerService ledgerService() {
-            return new LedgerService() {
+        AccountService accountService() {
+            return new AccountService() {
                 @Override
-                public LedgerEntry recordTransaction(
+                public Transaction recordTransaction(
                         AccountId accountId,
                         RecordTransactionInput command
                 ) {
                     if ("not-implemented".equals(command.reference())) {
-                        throw new UnsupportedOperationException("Ledger implementation intentionally left as a skeleton for Codex-assisted development.");
+                        throw new UnsupportedOperationException("Account implementation intentionally left as a skeleton for Codex-assisted development.");
                     }
-                    return entry(accountId);
+                    return transaction(accountId);
                 }
 
                 @Override
-                public Money currentBalance(AccountId accountId) {
-                    return new Money(12500, "GBP");
+                public Balance currentBalance(AccountId accountId) {
+                    return new Balance(12500, "GBP");
                 }
 
                 @Override
-                public List<LedgerEntry> history(AccountId accountId) {
-                    return List.of(entry(accountId));
+                public List<Transaction> history(AccountId accountId) {
+                    return List.of(transaction(accountId));
                 }
             };
         }
 
-        private static LedgerEntry entry(AccountId accountId) {
-            return new LedgerEntry(
+        private static Transaction transaction(AccountId accountId) {
+            return new Transaction(
                     TRANSACTION_ID,
                     accountId,
                     TransactionType.DEPOSIT,
                     new Money(10000, "GBP"),
-                    new Money(10000, "GBP"),
+                    new Balance(10000, "GBP"),
                     "Initial deposit",
                     OCCURRED_AT
             );

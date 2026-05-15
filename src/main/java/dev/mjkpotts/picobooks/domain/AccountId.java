@@ -4,7 +4,7 @@ public record AccountId(String value) {
 
     public AccountId {
         if (value == null || value.isBlank()) {
-            throw new InvalidLedgerRequestException("accountId must not be blank");
+            throw new InvalidDomainRequestException("accountId must not be blank");
         }
     }
 }

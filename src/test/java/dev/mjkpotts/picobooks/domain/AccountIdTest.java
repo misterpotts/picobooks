@@ -16,7 +16,7 @@ class AccountIdTest {
 
     @Test
     void rejectsBlankAccountId() {
-        var exception = assertThrows(InvalidLedgerRequestException.class, () -> new AccountId(" "));
+        var exception = assertThrows(InvalidDomainRequestException.class, () -> new AccountId(" "));
 
         assertEquals("accountId must not be blank", exception.getMessage());
     }

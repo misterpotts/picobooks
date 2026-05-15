@@ -2,11 +2,11 @@ package dev.mjkpotts.picobooks.domain;
 
 import java.util.Locale;
 
-public record Money(long value, String currency) {
+public record Balance(long value, String currency) {
 
-    public Money {
-        if (value <= 0) {
-            throw new InvalidDomainRequestException("value must be positive");
+    public Balance {
+        if (value < 0) {
+            throw new InvalidDomainRequestException("balance value must not be negative");
         }
         if (currency == null || currency.isBlank()) {
             throw new InvalidDomainRequestException("currency must not be blank");

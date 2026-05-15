@@ -1,13 +1,18 @@
 package dev.mjkpotts.picobooks.api;
 
+import dev.mjkpotts.picobooks.domain.Balance;
 import dev.mjkpotts.picobooks.domain.Money;
 
 record MoneyAmountResponse(
-        long amountMinor,
+        long value,
         String currency
 ) {
 
     static MoneyAmountResponse from(Money money) {
-        return new MoneyAmountResponse(money.amountMinor(), money.currency());
+        return new MoneyAmountResponse(money.value(), money.currency());
+    }
+
+    static MoneyAmountResponse from(Balance balance) {
+        return new MoneyAmountResponse(balance.value(), balance.currency());
     }
 }

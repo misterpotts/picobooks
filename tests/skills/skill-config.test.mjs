@@ -156,6 +156,8 @@ test("review-delivery-plan skill defines the plan reviewer persona", () => {
   assert.match(text, /skill coverage/);
   assert.match(text, /\$pr-driven-delivery/);
   assert.match(text, /\$domain-object-testability/);
+  assert.match(text, /do not plan tests that assert specific words exist in specs/i);
+  assert.match(text, /human review is the regression gate for spec prose/i);
   assert.match(text, /## Blocking Feedback/);
   assert.match(text, /## Non-blocking Notes/);
   assert.match(text, /## Verdict/);
@@ -181,6 +183,8 @@ test("review-implementation skill defines the implementation reviewer persona", 
   assert.match(text, /repository constraints/);
   assert.match(text, /verification/);
   assert.match(text, /\$domain-object-testability/);
+  assert.match(text, /Do not require or add word-assertion tests for OpenSpec\/spec prose/);
+  assert.match(text, /human review is the\s+regression gate for spec text/);
   assert.match(text, /## Blocking Feedback/);
   assert.match(text, /## Non-blocking Notes/);
   assert.match(text, /## Verdict/);

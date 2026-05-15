@@ -30,8 +30,8 @@ They are intentionally gitignored and should be copied into PR descriptions befo
 
 ## Terms
 
-- **Account**: A logical ledger holder identified by a path parameter.
-- **Transaction**: A requested deposit or withdrawal.
-- **Ledger entry**: The immutable record created when a transaction is accepted.
-- **Balance**: The current sum of accepted ledger entries for an account.
-- **Minor units**: Integer representation of currency, such as pence for GBP.
+- **Account**: Aggregate root identified by a service-generated account identifier.
+- **Ledger**: Value object held by one account; it contains accepted transactions and current balance.
+- **Transaction**: Entity representing an accepted deposit or withdrawal.
+- **Balance**: The current account position derived from accepted transactions.
+- **Currency base units**: Integer representation of currency, such as pence for GBP.
