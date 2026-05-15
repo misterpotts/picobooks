@@ -27,6 +27,13 @@ Use Codex and other agents as governed engineering assistants. Keep intent revie
 - Do not push directly to `main`.
 - Treat AI-generated changes as draft until reviewed by a human.
 
+## Boundary And Test Design
+
+- Treat API request DTOs as guarded boundary objects; validate required fields and simple shape in constructors or equivalent boundary types.
+- Do not knowingly pass `null` to another function. Reject missing data at the boundary or represent absence explicitly.
+- Keep error-code vocabulary canonical in `openspec/specs/**` before or alongside implementation.
+- Use Spring Boot integration tests for representative flows that prove wiring and serialization. Put edge cases in faster controller, DTO, domain, or application tests.
+
 ## Conventional Commits
 
 - Use Conventional Commits for every commit message.

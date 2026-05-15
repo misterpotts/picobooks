@@ -3,10 +3,9 @@ package dev.mjkpotts.picobooks.api;
 import dev.mjkpotts.picobooks.domain.Transaction;
 import dev.mjkpotts.picobooks.domain.TransactionType;
 import java.time.Instant;
-import java.util.UUID;
 
 record TransactionResponse(
-        UUID transactionId,
+        String transactionId,
         String accountId,
         TransactionType type,
         MoneyAmountResponse amount,
@@ -17,8 +16,8 @@ record TransactionResponse(
 
     static TransactionResponse from(Transaction transaction) {
         return new TransactionResponse(
-                transaction.transactionId(),
-                transaction.accountId().value(),
+                transaction.transactionId().asString(),
+                transaction.accountId().asString(),
                 transaction.type(),
                 MoneyAmountResponse.from(transaction.amount()),
                 MoneyAmountResponse.from(transaction.resultingBalance()),

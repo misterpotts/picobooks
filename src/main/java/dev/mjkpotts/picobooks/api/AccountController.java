@@ -1,8 +1,9 @@
 package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.picobooks.application.AccountService;
+import dev.mjkpotts.picobooks.application.LedgerService;
 import dev.mjkpotts.picobooks.domain.AccountId;
-import jakarta.validation.Valid;
+import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
+import dev.mjkpotts.picobooks.domain.LedgerException;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,35 +14,57 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/accounts/{accountId}")
+@RequestMapping("/accounts")
 final class AccountController {
 
-    private final AccountService accountService;
+    private final LedgerService ledgerService;
 
-    AccountController(AccountService accountService) {
-        this.accountService = accountService;
+    AccountController(LedgerService ledgerService) {
+        this.ledgerService = ledgerService;
     }
 
-    @PostMapping("/transactions")
+    @PostMapping
+    ResponseEntity<CreateAccountResponse> createAccount(@RequestBody CreateAccountRequest request) {
+        var accountRequest = requireRequest(request);
+        var account = ledgerService.createAccount(accountRequest.currency());
+        return ResponseEntity.status(201).body(CreateAccountResponse.from(account));
+    }
+
+    @PostMapping("/{accountId}/transactions")
     ResponseEntity<TransactionResponse> recordTransaction(
             @PathVariable String accountId,
-            @Valid @RequestBody RecordTransactionRequest request
+            @RequestBody RecordTransactionRequest request
     ) {
-        var transaction = accountService.recordTransaction(new AccountId(accountId), request.toCommand());
+        var transactionRequest = requireRequest(request);
+        var transaction = ledgerService.recordTransaction(new AccountId(accountId), transactionRequest.toCommand());
         return ResponseEntity.status(201).body(TransactionResponse.from(transaction));
     }
 
-    @GetMapping("/balance")
+    @GetMapping("/{accountId}/balance")
     BalanceResponse balance(@PathVariable String accountId) {
-        var balance = accountService.currentBalance(new AccountId(accountId));
+        var balance = ledgerService.currentBalance(new AccountId(accountId));
         return new BalanceResponse(accountId, MoneyAmountResponse.from(balance));
     }
 
-    @GetMapping("/transactions")
+    @GetMapping("/{accountId}/transactions")
     List<TransactionResponse> history(@PathVariable String accountId) {
-        return accountService.history(new AccountId(accountId))
+        return ledgerService.history(new AccountId(accountId))
                 .stream()
                 .map(TransactionResponse::from)
                 .toList();
+    }
+
+    private static CreateAccountRequest requireRequest(CreateAccountRequest request) {
+        if (request == null) {
+            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Request body is required");
+        }
+        return request;
+    }
+
+    private static RecordTransactionRequest requireRequest(RecordTransactionRequest request) {
+        if (request == null) {
+            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Request body is required");
+        }
+        return request;
     }
 }

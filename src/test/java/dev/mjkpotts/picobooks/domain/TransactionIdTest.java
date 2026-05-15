@@ -6,22 +6,22 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class AccountIdTest {
+class TransactionIdTest {
 
     @Test
-    void keepsProvidedAccountId() {
+    void keepsProvidedTransactionId() {
         var uuid = uuidV7(1);
-        var accountId = new AccountId(uuid.toString());
+        var transactionId = new TransactionId(uuid);
 
-        assertEquals(uuid, accountId.value());
-        assertEquals(uuid.toString(), accountId.asString());
+        assertEquals(uuid, transactionId.value());
+        assertEquals(uuid.toString(), transactionId.asString());
     }
 
     @Test
-    void rejectsNonUuidV7AccountId() {
-        var exception = assertThrows(LedgerException.class, () -> new AccountId("merchant-123"));
+    void rejectsNonUuidV7TransactionId() {
+        var exception = assertThrows(LedgerException.class, () -> new TransactionId(UUID.randomUUID()));
 
-        assertEquals(LedgerErrorCode.INVALID_ACCOUNT_ID, exception.code());
+        assertEquals(LedgerErrorCode.INVALID_TRANSACTION_ID, exception.code());
     }
 
     private static UUID uuidV7(long seed) {

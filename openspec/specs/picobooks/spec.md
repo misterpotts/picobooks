@@ -19,13 +19,15 @@ Returns service health.
 
 ### `POST /accounts`
 
-Creates an account and returns a producer-generated account identifier with HTTP `201 Created`.
-Clients SHALL NOT provide account identifiers.
+Creates an account with an account currency and returns a producer-generated account identifier with
+HTTP `201 Created`. Clients SHALL NOT provide account identifiers.
 
 Request:
 
 ```json
-{}
+{
+  "currency": "GBP"
+}
 ```
 
 Response:
@@ -133,6 +135,8 @@ Recognized bad-request error codes include:
 - `invalid_account_id`
 - `invalid_amount`
 - `invalid_currency`
+- `invalid_request`
+- `invalid_transaction_id`
 - `invalid_transaction_type`
 
 Valid-shape ledger requests rejected by account state return HTTP `409 Conflict`:
@@ -156,10 +160,11 @@ Recognized conflict error codes include:
 - `accountId` SHALL be a service-generated UUID v7 path value.
 - `transactionId` SHALL be a service-generated UUID v7 value.
 - `type` SHALL be `DEPOSIT` or `WITHDRAWAL`.
+- Account creation `currency` SHALL establish the account currency.
 - Money `value` SHALL be a positive integer in currency base units, such as pence for GBP.
 - Balance `value` SHALL be a non-negative integer in currency base units.
 - `currency` SHALL be accepted case-insensitively and normalized to uppercase three-letter form.
-- `reference` MAY be omitted or blank; accepted entries SHALL return the stored reference value.
+- `reference` MAY be omitted or blank; accepted transactions SHALL return the stored reference value.
 - `occurredAt` and `createdAt` SHALL be ISO-8601 instants.
 - Floating point money values SHALL NOT be accepted.
 
@@ -178,13 +183,15 @@ Java, Maven, and project dependencies.
 
 ### Requirement: Create an account explicitly
 
-The service SHALL create accounts only through an explicit account creation operation.
+The service SHALL create accounts only through an explicit account creation operation and SHALL set
+the account currency during account creation.
 
 #### Scenario: Account created
 
 - WHEN a client sends `POST /accounts`
 - THEN the service creates an account
 - AND the account is identified by a producer-generated UUID v7 `accountId`
+- AND the account currency is established from the request
 
 #### Scenario: Client-provided account identifiers are not accepted for account creation
 
@@ -268,12 +275,7 @@ The service SHALL represent money as an integer value with a three-letter curren
 
 ### Requirement: Use a single currency per account
 
-The service SHALL treat the first accepted transaction as establishing the account currency.
-
-#### Scenario: First transaction establishes currency
-
-- WHEN the first transaction for an account is accepted
-- THEN that transaction's currency becomes the account currency
+The service SHALL treat account creation as establishing the account currency.
 
 #### Scenario: Later transaction with different currency is rejected
 
@@ -319,21 +321,17 @@ classDiagram
       String reference
       Instant occurredAt
     }
-    class Ledger {
-      <<Value Object>>
-      Balance currentBalance
-      List~Transaction~ transactions
-    }
-    class Account {
+    class AccountLedger {
       <<Aggregate Root>>
       AccountId accountId
-      Ledger ledger
+      String currency
+      Balance currentBalance
+      List~Transaction~ entries
     }
 
-    Account *-- AccountId
-    Account *-- Ledger
-    Ledger *-- Balance
-    Ledger *-- Transaction
+    AccountLedger *-- AccountId
+    AccountLedger *-- Balance
+    AccountLedger *-- Transaction
     Transaction *-- TransactionId
     Transaction *-- AccountId
     Transaction *-- Money
@@ -348,27 +346,26 @@ classDiagram
 - **TransactionType**: Enumeration of `DEPOSIT` and `WITHDRAWAL`.
 - **Transaction**: Immutable accepted transaction entity containing transaction id, account id,
   transaction type, amount, resulting balance, optional reference, and occurrence time.
-- **Ledger**: Value object held by an account. It contains the accepted transactions and latest
-  balance used to answer reads without replaying the full transaction list.
-- **Account**: Aggregate root for exactly one account. It holds a ledger and owns currency
-  consistency, balance calculation, sufficient-funds checks, and append-only transaction creation.
+- **AccountLedger**: Aggregate root for exactly one account. It owns the account currency, current
+  balance, accepted transactions, currency consistency, sufficient-funds checks, and append-only
+  transaction creation.
 
 ## Solution Space
 
 ### Object Graph
 
 The API controller maps JSON into application commands. Account creation uses no client-provided
-identifier; the application creates an `Account` with a producer-generated `AccountId` and an empty
-`Ledger`.
+identifier; the application creates an `AccountLedger` with a producer-generated `AccountId`, the
+requested currency, zero balance, and no accepted transactions.
 
 Transaction commands address exactly one existing `AccountId`. The application service loads that
-one `Account`, asks the aggregate to accept or reject the transaction, and saves only that account's
-resulting ledger state. Read operations load only the requested account's ledger state and
+one `AccountLedger`, asks the aggregate to accept or reject the transaction, and saves only that
+account's resulting ledger state. Read operations load only the requested account's ledger state and
 project it into API responses.
 
-No domain object named or behaving as a global ledger SHALL coordinate multiple accounts. The
-`Ledger` value object is account-local only; no global ledger aggregate SHALL own balances,
-transactions, or transaction ordering across accounts.
+No domain object named or behaving as a global ledger SHALL coordinate multiple accounts. Each
+`AccountLedger` is account-local only; no global ledger aggregate SHALL own balances, transactions,
+or transaction ordering across accounts.
 
 ### Resulting Balance Decision
 
@@ -382,9 +379,9 @@ aggregate; there is no global ledger lock or cross-account balance owner.
 
 ### In-Memory Data Model
 
-The in-memory store SHALL be partitioned by `AccountId`. Each account partition owns one `Account`
-aggregate, its `Ledger` value, that ledger's ordered collection of `Transaction` entities, its
-latest `Balance`, and an account-scoped lock object.
+The in-memory store SHALL be partitioned by `AccountId`. Each account partition owns one
+`AccountLedger` aggregate, its ordered collection of `Transaction` entities, its latest `Balance`,
+and an account-scoped lock object.
 
 Account creation is explicit: `POST /accounts` creates the partition. Balance, history, and
 transaction writes for unknown account identifiers are rejected with `account_not_found`.
