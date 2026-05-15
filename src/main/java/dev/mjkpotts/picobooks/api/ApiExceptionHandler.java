@@ -27,8 +27,23 @@ final class ApiExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ApiError unreadableMessage(HttpMessageNotReadableException exception) {
-        return ApiError.of(LedgerErrorCode.INVALID_REQUEST.wireCode(), "Request body is invalid");
+    ResponseEntity<ApiError> unreadableMessage(HttpMessageNotReadableException exception) {
+        var ledgerException = nestedLedgerException(exception);
+        if (ledgerException != null) {
+            return ledgerFailure(ledgerException);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiError.of(LedgerErrorCode.INVALID_REQUEST.wireCode(), "Request body is invalid"));
+    }
+
+    private static LedgerException nestedLedgerException(Throwable exception) {
+        var cause = exception.getCause();
+        while (cause != null) {
+            if (cause instanceof LedgerException ledgerException) {
+                return ledgerException;
+            }
+            cause = cause.getCause();
+        }
+        return null;
     }
 }

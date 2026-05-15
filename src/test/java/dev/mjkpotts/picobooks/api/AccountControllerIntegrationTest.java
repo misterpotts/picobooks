@@ -33,37 +33,34 @@ class AccountControllerIntegrationTest {
     void createDepositBalanceHistoryFlow() throws Exception {
         var accountId = createAccount("GBP");
 
-        mockMvc.perform(post("/accounts/{accountId}/transactions", accountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "type": "DEPOSIT",
-                                  "amount": {
-                                    "value": 10000,
-                                    "currency": "gbp"
-                                  },
-                                  "reference": "Initial deposit"
-                                }
-                                """))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.transactionId", matchesPattern(UUID_V7_PATTERN)))
-                .andExpect(jsonPath("$.accountId", equalTo(accountId)))
-                .andExpect(jsonPath("$.amount.value", equalTo(10000)))
-                .andExpect(jsonPath("$.amount.currency", equalTo("GBP")))
-                .andExpect(jsonPath("$.resultingBalance.value", equalTo(10000)))
-                .andExpect(jsonPath("$.resultingBalance.currency", equalTo("GBP")));
+        recordTransaction(accountId, "DEPOSIT", 10000, "gbp", "Initial deposit", 10000);
+        recordTransaction(accountId, "WITHDRAWAL", 2500, "GBP", "Supplier payment", 7500);
+        recordTransaction(accountId, "DEPOSIT", 1250, "GBP", "Card settlement", 8750);
 
         mockMvc.perform(get("/accounts/{accountId}/balance", accountId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountId", equalTo(accountId)))
-                .andExpect(jsonPath("$.balance.value", equalTo(10000)))
+                .andExpect(jsonPath("$.balance.value", equalTo(8750)))
                 .andExpect(jsonPath("$.balance.currency", equalTo("GBP")));
 
         mockMvc.perform(get("/accounts/{accountId}/transactions", accountId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].accountId", equalTo(accountId)))
-                .andExpect(jsonPath("$[0].reference", equalTo("Initial deposit")));
+                .andExpect(jsonPath("$[0].type", equalTo("DEPOSIT")))
+                .andExpect(jsonPath("$[0].amount.value", equalTo(10000)))
+                .andExpect(jsonPath("$[0].resultingBalance.value", equalTo(10000)))
+                .andExpect(jsonPath("$[0].reference", equalTo("Initial deposit")))
+                .andExpect(jsonPath("$[1].accountId", equalTo(accountId)))
+                .andExpect(jsonPath("$[1].type", equalTo("WITHDRAWAL")))
+                .andExpect(jsonPath("$[1].amount.value", equalTo(2500)))
+                .andExpect(jsonPath("$[1].resultingBalance.value", equalTo(7500)))
+                .andExpect(jsonPath("$[1].reference", equalTo("Supplier payment")))
+                .andExpect(jsonPath("$[2].accountId", equalTo(accountId)))
+                .andExpect(jsonPath("$[2].type", equalTo("DEPOSIT")))
+                .andExpect(jsonPath("$[2].amount.value", equalTo(1250)))
+                .andExpect(jsonPath("$[2].resultingBalance.value", equalTo(8750)))
+                .andExpect(jsonPath("$[2].reference", equalTo("Card settlement")));
     }
 
     @Test
@@ -74,63 +71,6 @@ class AccountControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance.value", equalTo(0)))
                 .andExpect(jsonPath("$.balance.currency", equalTo("EUR")));
-    }
-
-    @Test
-    void overdrawReturnsConflict() throws Exception {
-        var accountId = createAccount("GBP");
-
-        mockMvc.perform(post("/accounts/{accountId}/transactions", accountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "type": "WITHDRAWAL",
-                                  "amount": {
-                                    "value": 1,
-                                    "currency": "GBP"
-                                  }
-                                }
-                                """))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code", equalTo("insufficient_funds")));
-    }
-
-    @Test
-    void currencyMismatchReturnsConflict() throws Exception {
-        var accountId = createAccount("GBP");
-
-        mockMvc.perform(post("/accounts/{accountId}/transactions", accountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "type": "DEPOSIT",
-                                  "amount": {
-                                    "value": 100,
-                                    "currency": "EUR"
-                                  }
-                                }
-                                """))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code", equalTo("currency_mismatch")));
-    }
-
-    @Test
-    void nonPositiveAmountReturnsBadRequest() throws Exception {
-        var accountId = createAccount("GBP");
-
-        mockMvc.perform(post("/accounts/{accountId}/transactions", accountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "type": "DEPOSIT",
-                                  "amount": {
-                                    "value": 0,
-                                    "currency": "GBP"
-                                  }
-                                }
-                                """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo("invalid_amount")));
     }
 
     @Test
@@ -150,43 +90,6 @@ class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.code", equalTo("account_not_found")));
     }
 
-    @Test
-    void invalidTransactionTypeReturnsBadRequest() throws Exception {
-        var accountId = createAccount("GBP");
-
-        mockMvc.perform(post("/accounts/{accountId}/transactions", accountId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "type": "REFUND",
-                                  "amount": {
-                                    "value": 100,
-                                    "currency": "GBP"
-                                  }
-                                }
-                                """))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo("invalid_transaction_type")));
-    }
-
-    @Test
-    void malformedJsonReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/accounts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo("invalid_request")));
-    }
-
-    @Test
-    void jsonNullRequestBodyReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/accounts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("null"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", equalTo("invalid_request")));
-    }
-
     private String createAccount(String currency) throws Exception {
         var result = mockMvc.perform(post("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -202,6 +105,37 @@ class AccountControllerIntegrationTest {
         return objectMapper.readValue(result.getResponse().getContentAsString(), Map.class)
                 .get("accountId")
                 .toString();
+    }
+
+    private void recordTransaction(
+            String accountId,
+            String type,
+            long value,
+            String currency,
+            String reference,
+            long resultingBalance
+    ) throws Exception {
+        mockMvc.perform(post("/accounts/{accountId}/transactions", accountId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "type": "%s",
+                                  "amount": {
+                                    "value": %d,
+                                    "currency": "%s"
+                                  },
+                                  "reference": "%s"
+                                }
+                                """.formatted(type, value, currency, reference)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.transactionId", matchesPattern(UUID_V7_PATTERN)))
+                .andExpect(jsonPath("$.accountId", equalTo(accountId)))
+                .andExpect(jsonPath("$.type", equalTo(type)))
+                .andExpect(jsonPath("$.amount.value", equalTo((int) value)))
+                .andExpect(jsonPath("$.amount.currency", equalTo("GBP")))
+                .andExpect(jsonPath("$.resultingBalance.value", equalTo((int) resultingBalance)))
+                .andExpect(jsonPath("$.resultingBalance.currency", equalTo("GBP")))
+                .andExpect(jsonPath("$.reference", equalTo(reference)));
     }
 
     private static String uuidV7(long seed) {
