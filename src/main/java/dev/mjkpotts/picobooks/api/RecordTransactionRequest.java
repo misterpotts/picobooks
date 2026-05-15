@@ -13,6 +13,6 @@ record RecordTransactionRequest(
 ) {
 
     RecordTransactionInput toCommand() {
-        return new RecordTransactionInput(type, new Money(amount.amountMinor(), amount.currency()), reference);
+        return new RecordTransactionInput(type, new Money(amount.value(), amount.currency()), reference);
     }
 }

@@ -36,8 +36,8 @@ Response:
 
 ### `POST /accounts/{accountId}/transactions`
 
-Records an accepted deposit or withdrawal for one existing account and returns the created ledger
-entry with HTTP `201 Created`.
+Records an accepted deposit or withdrawal for one existing account and returns the created
+transaction with HTTP `201 Created`.
 
 Request:
 
@@ -88,7 +88,7 @@ Returns the current balance for one existing account with HTTP `200 OK`.
 
 ### `GET /accounts/{accountId}/transactions`
 
-Returns accepted ledger entries for one existing account in append order with HTTP `200 OK`.
+Returns accepted transactions for one existing account in append order with HTTP `200 OK`.
 
 ```json
 [
@@ -178,7 +178,7 @@ The service SHALL create accounts only through an explicit account creation oper
 
 - WHEN a client submits a transaction for an account that has not been created
 - THEN the service rejects the request with `account_not_found`
-- AND no ledger entry is recorded
+- AND no transaction is recorded
 
 ### Requirement: Record a deposit
 
@@ -189,7 +189,7 @@ The service SHALL allow a client to record a positive deposit for an existing ac
 - WHEN a client submits a deposit for an account
 - AND the amount is positive
 - AND the currency is valid for that account
-- THEN the account ledger appends an immutable ledger entry
+- THEN the account's ledger appends an immutable transaction
 - AND the account balance increases by the deposit amount
 
 ### Requirement: Record a withdrawal
@@ -203,14 +203,14 @@ sufficient funds are available.
 - AND the amount is positive
 - AND the account has sufficient funds
 - AND the currency is valid for that account
-- THEN the account ledger appends an immutable ledger entry
+- THEN the account's ledger appends an immutable transaction
 - AND the account balance decreases by the withdrawal amount
 
 #### Scenario: Withdrawal rejected for insufficient funds
 
 - WHEN a client submits a withdrawal that would make the account balance negative
 - THEN the service rejects the request with `insufficient_funds`
-- AND no ledger entry is recorded
+- AND no transaction is recorded
 
 ### Requirement: View current balance
 
@@ -218,7 +218,7 @@ The service SHALL allow a client to view the current balance for an existing acc
 
 #### Scenario: Balance returned
 
-- WHEN a client requests the balance for an account with accepted ledger entries
+- WHEN a client requests the balance for an account with accepted transactions
 - THEN the service returns the latest authoritative resulting balance
 - AND the balance is expressed in currency base units and currency
 
@@ -229,8 +229,8 @@ The service SHALL allow a client to view transaction history for an existing acc
 #### Scenario: History returned
 
 - WHEN a client requests transaction history for an account
-- THEN the service returns accepted ledger entries for that account in append order
-- AND each entry includes transaction type, amount, resulting balance, reference, and occurrence time
+- THEN the service returns accepted transactions for that account in append order
+- AND each transaction includes transaction type, amount, resulting balance, reference, and occurrence time
 
 ### Requirement: Represent money in currency base units
 
@@ -246,7 +246,7 @@ The service SHALL represent money as an integer value with a three-letter curren
 
 - WHEN a client submits zero or a negative amount
 - THEN the service rejects the request with `invalid_amount`
-- AND no ledger entry is recorded
+- AND no transaction is recorded
 
 ### Requirement: Use a single currency per account
 
@@ -262,7 +262,7 @@ The service SHALL treat the first accepted transaction as establishing the accou
 - GIVEN an account has an established currency
 - WHEN a later transaction uses a different currency
 - THEN the service rejects the request with `currency_mismatch`
-- AND no ledger entry is recorded
+- AND no transaction is recorded
 
 ## Domain Object Definitions
 
@@ -291,7 +291,7 @@ classDiagram
       DEPOSIT
       WITHDRAWAL
     }
-    class LedgerEntry {
+    class Transaction {
       <<Entity>>
       TransactionId transactionId
       AccountId accountId
@@ -301,51 +301,60 @@ classDiagram
       String reference
       Instant occurredAt
     }
-    class AccountLedger {
+    class Ledger {
+      <<Value Object>>
+      Balance currentBalance
+      List~Transaction~ transactions
+    }
+    class Account {
       <<Aggregate Root>>
       AccountId accountId
-      Balance currentBalance
-      List~LedgerEntry~ entries
+      Ledger ledger
     }
 
-    AccountLedger *-- AccountId
-    AccountLedger *-- Balance
-    AccountLedger *-- LedgerEntry
-    LedgerEntry *-- TransactionId
-    LedgerEntry *-- AccountId
-    LedgerEntry *-- Money
-    LedgerEntry *-- Balance
-    LedgerEntry --> TransactionType
+    Account *-- AccountId
+    Account *-- Ledger
+    Ledger *-- Balance
+    Ledger *-- Transaction
+    Transaction *-- TransactionId
+    Transaction *-- AccountId
+    Transaction *-- Money
+    Transaction *-- Balance
+    Transaction --> TransactionType
 ```
 
 - **AccountId**: Value object wrapping a producer-generated UUID v7 account identifier.
-- **TransactionId**: Value object wrapping a producer-generated UUID v7 ledger-entry identifier.
+- **TransactionId**: Value object wrapping a producer-generated UUID v7 transaction identifier.
 - **Money**: Value object for a positive transaction amount and normalized three-letter currency.
 - **Balance**: Value object for a non-negative current account position and currency.
 - **TransactionType**: Enumeration of `DEPOSIT` and `WITHDRAWAL`.
-- **LedgerEntry**: Immutable accepted transaction entity containing transaction id, account id,
+- **Transaction**: Immutable accepted transaction entity containing transaction id, account id,
   transaction type, amount, resulting balance, optional reference, and occurrence time.
-- **AccountLedger**: Aggregate root for exactly one account. It owns currency consistency, balance
-  calculation, sufficient-funds checks, and append-only entry creation.
+- **Ledger**: Value object held by an account. It contains the accepted transactions and latest
+  balance used to answer reads without replaying the full transaction list.
+- **Account**: Aggregate root for exactly one account. It holds a ledger and owns currency
+  consistency, balance calculation, sufficient-funds checks, and append-only transaction creation.
 
 ## Solution Space
 
 ### Object Graph
 
 The API controller maps JSON into application commands. Account creation uses no client-provided
-identifier; the application creates an `AccountLedger` with a producer-generated `AccountId`.
+identifier; the application creates an `Account` with a producer-generated `AccountId` and an empty
+`Ledger`.
 
 Transaction commands address exactly one existing `AccountId`. The application service loads that
-one `AccountLedger`, asks the aggregate to accept or reject the transaction, and saves only that
-account's resulting ledger state. Read operations load only the requested account's ledger state and
+one `Account`, asks the aggregate to accept or reject the transaction, and saves only that account's
+resulting ledger state. Read operations load only the requested account's ledger state and
 project it into API responses.
 
-No domain object named or behaving as a global ledger SHALL coordinate multiple accounts. No global
-ledger aggregate SHALL own balances, entries, or transaction ordering across accounts.
+No domain object named or behaving as a global ledger SHALL coordinate multiple accounts. The
+`Ledger` value object is account-local only; no global ledger aggregate SHALL own balances,
+transactions, or transaction ordering across accounts.
 
 ### Resulting Balance Decision
 
-Each `LedgerEntry` stores the resulting balance after that entry is accepted. This is deliberate:
+Each `Transaction` stores the resulting balance after that transaction is accepted. This is deliberate:
 insufficient-funds rejection requires transactionality and ordering for each account so concurrent
 withdrawals cannot both observe the same old balance and overdraw the account.
 
@@ -355,8 +364,9 @@ there is no global ledger lock or cross-account balance owner.
 
 ### In-Memory Data Model
 
-The in-memory store SHALL be partitioned by `AccountId`. Each account partition owns its ordered
-collection of `LedgerEntry` records, its latest `Balance`, and an account-scoped lock object.
+The in-memory store SHALL be partitioned by `AccountId`. Each account partition owns one `Account`
+aggregate, its `Ledger` value, that ledger's ordered collection of `Transaction` entities, its
+latest `Balance`, and an account-scoped lock object.
 
 Account creation is explicit: `POST /accounts` creates the partition. Balance, history, and
 transaction writes for unknown account identifiers are rejected with `account_not_found`.
@@ -367,7 +377,7 @@ Balance and history reads for one account SHALL NOT require scanning other accou
 
 The write model is account-scoped, but the design SHALL NOT prevent future operational intelligence
 or fraud-detection reads across account aggregates. A future read-side projection or secondary index
-MAY index immutable ledger entries by `occurredAt`, transaction type, currency, and account id to
+MAY index immutable transactions by `occurredAt`, transaction type, currency, and account id to
 support cross-account time-window queries.
 
 Such projections are read models. They SHALL NOT own balances, enforce insufficient-funds rules, or

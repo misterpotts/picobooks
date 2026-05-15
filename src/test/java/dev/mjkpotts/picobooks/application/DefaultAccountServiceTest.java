@@ -7,9 +7,9 @@ import dev.mjkpotts.picobooks.domain.Money;
 import dev.mjkpotts.picobooks.domain.TransactionType;
 import org.junit.jupiter.api.Test;
 
-class DefaultLedgerServiceTest {
+class DefaultAccountServiceTest {
 
-    private final DefaultLedgerService service = new DefaultLedgerService();
+    private final DefaultAccountService service = new DefaultAccountService();
     private final AccountId accountId = new AccountId("merchant-123");
 
     @Test

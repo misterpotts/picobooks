@@ -1,20 +1,20 @@
 package dev.mjkpotts.picobooks.infrastructure;
 
+import dev.mjkpotts.picobooks.domain.Account;
 import dev.mjkpotts.picobooks.domain.AccountId;
-import dev.mjkpotts.picobooks.domain.LedgerEntry;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
-final class InMemoryLedgerRepository implements LedgerRepository {
+final class InMemoryAccountRepository implements AccountRepository {
 
     @Override
-    public List<LedgerEntry> findByAccountId(AccountId accountId) {
+    public Optional<Account> findById(AccountId accountId) {
         throw new UnsupportedOperationException("Repository implementation intentionally left as a skeleton.");
     }
 
     @Override
-    public LedgerEntry append(LedgerEntry entry) {
+    public Account save(Account account) {
         throw new UnsupportedOperationException("Repository implementation intentionally left as a skeleton.");
     }
 }

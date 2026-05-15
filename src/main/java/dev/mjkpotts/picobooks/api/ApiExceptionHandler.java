@@ -1,6 +1,6 @@
 package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.picobooks.domain.InvalidLedgerRequestException;
+import dev.mjkpotts.picobooks.domain.InvalidDomainRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,10 +16,10 @@ final class ApiExceptionHandler {
         return ApiError.of("not_implemented", exception.getMessage());
     }
 
-    @ExceptionHandler(InvalidLedgerRequestException.class)
+    @ExceptionHandler(InvalidDomainRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ApiError invalidLedgerRequest(InvalidLedgerRequestException exception) {
-        return ApiError.of("invalid_ledger_request", exception.getMessage());
+    ApiError invalidDomainRequest(InvalidDomainRequestException exception) {
+        return ApiError.of("invalid_request", exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
