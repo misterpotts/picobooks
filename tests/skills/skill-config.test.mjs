@@ -60,6 +60,26 @@ test("pr-driven-delivery requires staged agent review before release", () => {
   assert.match(text, /Use `\$domain-object-testability`/);
 });
 
+test("repository agent guidance captures boundary and test-design rules", () => {
+  const text = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
+
+  assert.match(text, /## Boundary And Test Design/);
+  assert.match(text, /API request DTOs as guarded boundary objects/);
+  assert.match(text, /Do not knowingly pass `null`/);
+  assert.match(text, /error-code vocabulary canonical/);
+  assert.match(text, /Spring Boot integration tests for representative flows/);
+  assert.match(text, /edge cases in faster controller, DTO, domain, or application tests/);
+});
+
+test("pr-driven-delivery captures repeatable review learnings", () => {
+  const skillPath = join(skillRoot, "SKILL.md");
+  const text = readFileSync(skillPath, "utf8");
+
+  assert.match(text, /repeatable repository rule/);
+  assert.match(text, /AGENTS\.md/);
+  assert.match(text, /skill, hook, or test configuration/);
+});
+
 test("domain-object-testability skill has required frontmatter and metadata", () => {
   const skillPath = join(domainSkillRoot, "SKILL.md");
   assert.equal(existsSync(skillPath), true);
@@ -101,11 +121,16 @@ test("domain-object-testability skill covers the full domain change lifecycle", 
   assert.match(text, /hidden global state/);
   assert.match(text, /utility dumping grounds/);
   assert.match(text, /deep collaborator traversal/);
+  assert.match(text, /Do not knowingly pass `null`/);
+  assert.match(text, /guarded DTO construction/);
+  assert.match(text, /Jackson or Spring exceptions/);
 
   assert.match(text, /### Review/);
   assert.match(text, /Spring pragmatism/);
   assert.match(text, /domain behavior stayed inside domain objects/);
   assert.match(text, /explicit and local/);
+  assert.match(text, /API request DTOs/);
+  assert.match(text, /deliberate `null` forwarding as blocking/);
   assert.match(text, /\$review-delivery-plan/);
   assert.match(text, /\$review-implementation/);
   assert.match(text, /During plan review/);
@@ -154,6 +179,11 @@ test("review-delivery-plan skill defines the plan reviewer persona", () => {
   assert.match(text, /repository constraints/);
   assert.match(text, /implementation readiness/);
   assert.match(text, /skill coverage/);
+  assert.match(text, /request DTO validation/);
+  assert.match(text, /missing-body handling/);
+  assert.match(text, /stable error-code vocabulary/);
+  assert.match(text, /representative Spring Boot integration flows/);
+  assert.match(text, /faster controller, DTO, domain, or application tests/);
   assert.match(text, /\$pr-driven-delivery/);
   assert.match(text, /\$domain-object-testability/);
   assert.match(text, /do not plan tests that assert specific words exist in specs/i);
@@ -182,6 +212,11 @@ test("review-implementation skill defines the implementation reviewer persona", 
   assert.match(text, /correctness and maintainability/);
   assert.match(text, /repository constraints/);
   assert.match(text, /verification/);
+  assert.match(text, /request DTOs or equivalent boundary types validate/);
+  assert.match(text, /knowingly passes `null`/);
+  assert.match(text, /documented in the accepted spec/);
+  assert.match(text, /representative flows rather than every edge case/);
+  assert.match(text, /faster controller, DTO, domain, or application tests/);
   assert.match(text, /\$domain-object-testability/);
   assert.match(text, /Do not require or add word-assertion tests for OpenSpec\/spec prose/);
   assert.match(text, /human review is the\s+regression gate for spec text/);

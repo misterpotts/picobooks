@@ -6,8 +6,9 @@ description: Use when planning/designing, implementing, or reviewing domain code
 # Domain Object Testability
 
 Use this skill as a lifecycle checklist for Picobooks domain work. Keep Spring MVC controllers,
-DTOs, validation annotations, configuration, and framework wiring pragmatic at boundaries; apply
-stricter object-design scrutiny to domain and application code.
+DTOs, validation annotations, configuration, and framework wiring pragmatic at boundaries, but do
+not treat API request DTOs as unguarded bags; apply stricter object-design scrutiny to domain and
+application code.
 
 This skill complements `$pr-driven-delivery`, `$review-delivery-plan`, and
 `$review-implementation`; it does not replace branch, commit, PR, or gate rules.
@@ -30,6 +31,10 @@ application service repeatedly extracts state from objects and performs domain d
 Plan test seams early. Domain behavior should be unit-testable without Spring, IO, clocks, random
 numbers, environment state, or real repositories unless the seam itself is under test.
 
+For API changes, decide where request-shape validation lives before implementation. Prefer guarded
+request DTO constructors or tiny boundary types for required fields and simple shape checks, and
+keep stable wire error codes aligned with the accepted spec.
+
 Read `references/domain-driven-design.md` when the main uncertainty is terminology, aggregate
 boundaries, or whether a concept is an entity, value object, or service.
 
@@ -43,8 +48,9 @@ Favor behavior-rich objects with names and methods that read like the domain, no
 Prefer immutable value objects. Validate required facts at construction or factory boundaries, and
 keep constructors limited to assignment plus simple validation.
 
-Do not return `null` from domain methods. Prefer a domain exception, a Null Object where meaningful,
-or an explicit absence type such as `Optional` at application or boundary seams.
+Do not return `null` from domain methods. Do not knowingly pass `null` to another function as a
+delegation shortcut. Prefer a domain exception, a Null Object where meaningful, or an explicit
+absence type such as `Optional` at application or boundary seams.
 
 Inject collaborators explicitly. Avoid hidden global state, service locators, mutable static fields,
 and singleton access from domain code.
@@ -55,9 +61,14 @@ it an object or focused service; if it is framework glue, keep it near the bound
 Avoid deep collaborator traversal. Ask a collaborator to do meaningful work instead of walking
 through its internals to reach another object.
 
-Keep Spring pragmatism explicit: controllers may be thin adapters, DTOs may be data carriers, and
-validation annotations may express input constraints. Do not let those boundary compromises leak
-into the domain model by default.
+Keep Spring pragmatism explicit: controllers may be thin adapters, DTOs may be serialization-friendly
+records, and validation annotations may express input constraints. Request DTOs still need guard
+clauses or delegated boundary validation for required fields and simple shape; do not let boundary
+compromises leak into the domain model by default.
+
+When guarded DTO construction can be wrapped by Jackson or Spring exceptions, make the exception
+handler preserve the specific domain or API error code instead of collapsing every case into a
+generic malformed-request response.
 
 Read `references/elegant-objects.md` when deciding object shape, null handling, static helpers, or
 Spring boundary exceptions. Read `references/testability.md` when tests are awkward or collaborators
@@ -75,6 +86,10 @@ no constructor side effects, and no mandatory real infrastructure.
 
 Check whether aggregate boundaries protect invariants and avoid exposing internals through getters
 that exist only so another class can make domain decisions.
+
+Check whether API request DTOs, controllers, and application entry points reject missing or invalid
+input before collaborators are called. Flag deliberate `null` forwarding as blocking unless the
+collaborator contract explicitly accepts absence.
 
 Check whether any EO, DDD, or testability compromise is explicit and local. Accept pragmatic Spring
 boundary code, but require a short rationale for compromises inside domain/application code.

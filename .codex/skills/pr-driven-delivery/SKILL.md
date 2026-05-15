@@ -97,3 +97,5 @@ The resulting code, tests, documentation, and PR description were reviewed befor
 - Treat review comments as requested changes, not as approval.
 - Make follow-up commits with Conventional Commit messages.
 - Keep PR bodies current when assumptions, verification, or scope changes.
+- When review feedback exposes a repeatable repository rule, update the relevant `AGENTS.md`,
+  skill, hook, or test configuration in the same PR when requested.

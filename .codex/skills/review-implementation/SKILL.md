@@ -21,6 +21,11 @@ Check intent fit:
 Check correctness and maintainability:
 - Review for bugs, regressions, fragile edge cases, and unclear ownership boundaries.
 - Confirm code follows existing package, test, and naming conventions.
+- For API/controller changes, check that request DTOs or equivalent boundary types validate required
+  fields and simple shape before service calls.
+- Flag code that knowingly passes `null` to another function as blocking unless the called contract
+  explicitly accepts absence.
+- Confirm structured API error codes emitted by handlers are documented in the accepted spec.
 - For domain/application changes, apply `$domain-object-testability` and flag weak domain language,
   misplaced behaviour, hidden global state, null-prone APIs, or hard-to-test design.
 
@@ -31,6 +36,8 @@ Check repository constraints:
 
 Check verification:
 - Confirm focused tests cover the change and `mvn verify` ran after the latest relevant edits.
+- Confirm Spring Boot integration tests prove representative flows rather than every edge case, and
+  that edge cases are covered in faster controller, DTO, domain, or application tests where practical.
 - Confirm skill/config changes have appropriate Node tests and skill validation where applicable.
 - Do not require or add word-assertion tests for OpenSpec/spec prose; human review is the
   regression gate for spec text.

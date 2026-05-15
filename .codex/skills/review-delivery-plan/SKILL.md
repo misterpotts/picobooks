@@ -26,6 +26,10 @@ Check implementation readiness:
 - Confirm affected interfaces, data flow, failure modes, and compatibility constraints are clear enough to implement.
 - Confirm tests and local gates are specific, including `mvn verify` for relevant repo changes.
 - Confirm any expected docs, README, OpenSpec specs, or PR body updates are named.
+- For API/controller changes, confirm the plan names request DTO validation, missing-body handling,
+  and stable error-code vocabulary.
+- For test plans, require representative Spring Boot integration flows for wiring/serialization and
+  faster controller, DTO, domain, or application tests for edge cases.
 - For spec-only documentation changes, do not plan tests that assert specific words exist in specs;
   human review is the regression gate for spec prose.
 
