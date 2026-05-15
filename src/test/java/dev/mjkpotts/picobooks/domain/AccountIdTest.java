@@ -1,6 +1,7 @@
 package dev.mjkpotts.picobooks.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
@@ -21,7 +22,8 @@ class AccountIdTest {
     void rejectsNonUuidV7AccountId() {
         var exception = assertThrows(LedgerException.class, () -> new AccountId("merchant-123"));
 
-        assertEquals(LedgerErrorCode.INVALID_ACCOUNT_ID, exception.code());
+        assertInstanceOf(InvalidAccountIdException.class, exception);
+        assertEquals("invalid_account_id", exception.wireCode());
     }
 
     private static UUID uuidV7(long seed) {

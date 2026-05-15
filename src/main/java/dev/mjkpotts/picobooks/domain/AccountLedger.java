@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Aggregate root owning one account's currency, balance, and accepted transaction history.
+ */
 public final class AccountLedger {
 
     private final AccountId accountId;
@@ -52,15 +55,15 @@ public final class AccountLedger {
             Instant occurredAt
     ) {
         if (amount == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_AMOUNT, "Transaction amount is required");
+            throw new InvalidAmountException("Transaction amount is required");
         }
         Objects.requireNonNull(transactionId, "transactionId must not be null");
         Objects.requireNonNull(occurredAt, "occurredAt must not be null");
         if (type == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_TRANSACTION_TYPE, "Transaction type is required");
+            throw new InvalidTransactionTypeException("Transaction type is required");
         }
         if (!currency.equals(amount.currency())) {
-            throw new LedgerException(LedgerErrorCode.CURRENCY_MISMATCH, "Transaction currency must match account currency");
+            throw new CurrencyMismatchException();
         }
 
         var resultingBalance = switch (type) {
@@ -84,7 +87,7 @@ public final class AccountLedger {
     private Balance withdraw(Money amount) {
         var resultingValue = currentBalance.value() - amount.value();
         if (resultingValue < 0) {
-            throw new LedgerException(LedgerErrorCode.INSUFFICIENT_FUNDS, "Withdrawal would overdraw account");
+            throw new InsufficientFundsException();
         }
         return new Balance(resultingValue, currency);
     }

@@ -2,15 +2,18 @@ package dev.mjkpotts.picobooks.application;
 
 import dev.mjkpotts.picobooks.domain.AccountLedger;
 import dev.mjkpotts.picobooks.domain.AccountId;
+import dev.mjkpotts.picobooks.domain.AccountNotFoundException;
 import dev.mjkpotts.picobooks.domain.Balance;
-import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
-import dev.mjkpotts.picobooks.domain.LedgerException;
+import dev.mjkpotts.picobooks.domain.InvalidRequestException;
 import dev.mjkpotts.picobooks.domain.Transaction;
 import dev.mjkpotts.picobooks.infrastructure.LedgerRepository;
 import java.time.Clock;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
+/**
+ * Default application service coordinating account ledger persistence, IDs, and timestamps.
+ */
 @Service
 final class DefaultLedgerService implements LedgerService {
 
@@ -40,7 +43,7 @@ final class DefaultLedgerService implements LedgerService {
     @Override
     public Transaction recordTransaction(AccountId accountId, RecordTransactionInput command) {
         if (command == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Transaction payload is required");
+            throw new InvalidRequestException("Transaction payload is required");
         }
         return repository.update(accountId, ledger -> ledger.record(
                 command.type(),
@@ -65,7 +68,7 @@ final class DefaultLedgerService implements LedgerService {
                 .orElseThrow(() -> notFound(accountId));
     }
 
-    private LedgerException notFound(AccountId accountId) {
-        return new LedgerException(LedgerErrorCode.ACCOUNT_NOT_FOUND, "Account not found: " + accountId.asString());
+    private AccountNotFoundException notFound(AccountId accountId) {
+        return new AccountNotFoundException(accountId);
     }
 }

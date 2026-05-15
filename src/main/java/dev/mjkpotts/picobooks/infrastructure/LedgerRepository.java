@@ -5,6 +5,9 @@ import dev.mjkpotts.picobooks.domain.AccountId;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Persistence boundary for account ledger aggregate storage and serialized updates.
+ */
 public interface LedgerRepository {
 
     AccountLedger create(AccountLedger ledger);

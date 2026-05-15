@@ -2,14 +2,16 @@ package dev.mjkpotts.picobooks.infrastructure;
 
 import dev.mjkpotts.picobooks.domain.AccountLedger;
 import dev.mjkpotts.picobooks.domain.AccountId;
-import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
-import dev.mjkpotts.picobooks.domain.LedgerException;
+import dev.mjkpotts.picobooks.domain.AccountNotFoundException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import org.springframework.stereotype.Repository;
 
+/**
+ * In-memory account-partitioned ledger repository for the assessment runtime.
+ */
 @Repository
 final class InMemoryLedgerRepository implements LedgerRepository {
 
@@ -19,7 +21,7 @@ final class InMemoryLedgerRepository implements LedgerRepository {
     public AccountLedger create(AccountLedger ledger) {
         var existing = ledgers.putIfAbsent(ledger.accountId(), ledger);
         if (existing != null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_ACCOUNT_ID, "Account already exists");
+            throw new IllegalStateException("Account already exists: " + ledger.accountId().asString());
         }
         return ledger;
     }
@@ -34,7 +36,7 @@ final class InMemoryLedgerRepository implements LedgerRepository {
         var result = new AtomicReference<T>();
         ledgers.compute(accountId, (ignored, ledger) -> {
             if (ledger == null) {
-                throw new LedgerException(LedgerErrorCode.ACCOUNT_NOT_FOUND, "Account not found: " + accountId.asString());
+                throw new AccountNotFoundException(accountId);
             }
             result.set(operation.apply(ledger));
             return ledger;
