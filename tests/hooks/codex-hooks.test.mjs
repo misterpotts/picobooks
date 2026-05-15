@@ -102,7 +102,7 @@ test("pre tool hook allows conventional commit messages", () => {
 
 test("pre tool hook denies non-conventional PR titles", () => {
   const payload = runHook("pre_tool_use_policy.mjs", {
-    tool_input: { command: "gh pr create --draft --title \"Update workflow\"" },
+    tool_input: { command: "gh pr create --title \"Update workflow\"" },
   });
 
   assert.equal(payload.hookSpecificOutput.permissionDecision, "deny");
@@ -111,7 +111,7 @@ test("pre tool hook denies non-conventional PR titles", () => {
 
 test("pre tool hook allows conventional PR titles", () => {
   const payload = runHook("pre_tool_use_policy.mjs", {
-    tool_input: { command: "gh pr create --draft --title \"chore: update workflow\"" },
+    tool_input: { command: "gh pr create --title \"chore: update workflow\"" },
   });
 
   assert.deepEqual(payload, {});

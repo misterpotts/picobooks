@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: tiny-ledger
+  main:
+    web-application-type: servlet
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  shutdown: graceful
