@@ -1,3 +1,5 @@
+<img src="assets/picobooks-logo.jpg">
+
 # Picobooks
 
 Picobooks is a deliberately small Java/Spring Boot ledger repository for the Teya take-home assessment.
