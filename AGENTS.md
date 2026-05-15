@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository is a Java/Spring Boot tiny-ledger project for the Teya take-home assessment.
+This repository is the Picobooks Java/Spring Boot ledger project for the Teya take-home assessment.
 
 Use Codex and other agents as governed engineering assistants. Keep intent reviewable, make small changes, and preserve human review as the acceptance boundary.
 

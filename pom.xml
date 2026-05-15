@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>dev.mjkpotts</groupId>
-    <artifactId>tiny-ledger</artifactId>
+    <artifactId>picobooks</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>tiny-ledger</name>
-    <description>Skeleton tiny ledger service with Codex governance harness.</description>
+    <name>picobooks</name>
+    <description>Picobooks ledger service with Codex governance harness.</description>
 
     <properties>
         <java.version>25</java.version>

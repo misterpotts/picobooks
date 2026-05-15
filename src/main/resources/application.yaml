@@ -1,6 +1,6 @@
 spring:
   application:
-    name: tiny-ledger
+    name: picobooks
   main:
     web-application-type: servlet
   threads:

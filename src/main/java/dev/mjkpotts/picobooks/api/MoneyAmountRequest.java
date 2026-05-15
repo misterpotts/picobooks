@@ -1,0 +1,10 @@
+package dev.mjkpotts.picobooks.api;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
+record MoneyAmountRequest(
+        @Positive long amountMinor,
+        @NotBlank String currency
+) {
+}
