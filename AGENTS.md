@@ -1,0 +1,39 @@
+# AGENTS.md
+
+## Purpose
+
+This repository is a Java/Spring Boot tiny-ledger project for the Teya take-home assessment.
+
+Use Codex and other agents as governed engineering assistants. Keep intent reviewable, make small changes, and preserve human review as the acceptance boundary.
+
+## Assessment Constraints
+
+- Use Java 25.
+- Use Spring Boot 3.5.x.
+- Use Spring MVC / servlet web.
+- Do not introduce Spring WebFlux, Reactor-first designs, or reactive programming.
+- Enable virtual threads with `spring.threads.virtual.enabled=true`.
+- Use in-memory storage only.
+- Keep the application runnable locally with Maven.
+- Do not add auth, persistence, queues, Kafka, containers, service discovery, or deployment infrastructure for the assessment.
+
+## PR-Driven Workflow
+
+- Do all non-trivial work on a non-main branch.
+- Open a pull request for review before merging.
+- Agents may create and edit non-draft PRs, but must not merge PRs or approve their own work.
+- Do not push directly to `main`.
+- Treat AI-generated changes as draft until reviewed by a human.
+
+## Conventional Commits
+
+- Use Conventional Commits for every commit message.
+- Use a commitlint-compatible Conventional Commit title for every PR.
+- Allowed types are `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`.
+- Keep commit bodies short. Omit bodies for simple commits; when needed, keep body/footer lines concise and wrapped at 100 characters.
+
+## Initial Quality Gate
+
+Before opening or updating a PR, ensure the PR title and commit messages are Conventional Commit compatible.
+
+CI enforces this on pull requests.
