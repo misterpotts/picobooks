@@ -1,10 +1,15 @@
 package dev.mjkpotts.picobooks.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 class AccountLedgerTest {
@@ -51,7 +56,8 @@ class AccountLedgerTest {
                 Instant.parse("2026-05-15T12:01:00Z")
         ));
 
-        assertEquals(LedgerErrorCode.INSUFFICIENT_FUNDS, exception.code());
+        assertInstanceOf(InsufficientFundsException.class, exception);
+        assertEquals("insufficient_funds", exception.wireCode());
         assertEquals(new Balance(0, "GBP"), ledger.currentBalance());
         assertEquals(0, ledger.entries().size());
     }
@@ -68,7 +74,8 @@ class AccountLedgerTest {
                 Instant.parse("2026-05-15T12:01:00Z")
         ));
 
-        assertEquals(LedgerErrorCode.CURRENCY_MISMATCH, exception.code());
+        assertInstanceOf(CurrencyMismatchException.class, exception);
+        assertEquals("currency_mismatch", exception.wireCode());
         assertEquals(new Balance(0, "GBP"), ledger.currentBalance());
         assertEquals(0, ledger.entries().size());
     }
@@ -81,6 +88,43 @@ class AccountLedgerTest {
 
         assertEquals(first, ledger.entries().get(0));
         assertEquals(second, ledger.entries().get(1));
+    }
+
+    @Test
+    void concurrentRecordsObserveLinearizedBalanceAndHistory() throws Exception {
+        var ledger = AccountLedger.create(accountId, "GBP", Instant.parse("2026-05-15T12:00:00Z"));
+        var writes = 80;
+        var start = new CountDownLatch(1);
+        var failures = new ArrayList<Throwable>();
+
+        try (var executor = Executors.newFixedThreadPool(8)) {
+            for (int i = 0; i < writes; i++) {
+                var seed = i + 2L;
+                executor.submit(() -> {
+                    try {
+                        start.await();
+                        ledger.record(
+                                TransactionType.DEPOSIT,
+                                new Money(1, "GBP"),
+                                "deposit-" + seed,
+                                new TransactionId(uuidV7(seed)),
+                                Instant.parse("2026-05-15T12:01:00Z")
+                        );
+                    } catch (Throwable throwable) {
+                        synchronized (failures) {
+                            failures.add(throwable);
+                        }
+                    }
+                });
+            }
+            start.countDown();
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        }
+
+        assertEquals(0, failures.size());
+        assertEquals(new Balance(writes, "GBP"), ledger.currentBalance());
+        assertEquals(writes, ledger.entries().size());
     }
 
     private static UUID uuidV7(long seed) {

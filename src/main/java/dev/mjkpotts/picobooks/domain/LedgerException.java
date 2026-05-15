@@ -1,15 +1,18 @@
 package dev.mjkpotts.picobooks.domain;
 
-public final class LedgerException extends RuntimeException {
+/**
+ * Base type for ledger-domain failures that are returned to API clients with stable wire codes.
+ */
+public abstract class LedgerException extends RuntimeException {
 
-    private final LedgerErrorCode code;
+    private final String wireCode;
 
-    public LedgerException(LedgerErrorCode code, String message) {
+    protected LedgerException(String wireCode, String message) {
         super(message);
-        this.code = code;
+        this.wireCode = wireCode;
     }
 
-    public LedgerErrorCode code() {
-        return code;
+    public final String wireCode() {
+        return wireCode;
     }
 }

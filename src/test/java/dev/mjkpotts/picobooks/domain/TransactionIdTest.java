@@ -1,6 +1,7 @@
 package dev.mjkpotts.picobooks.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
@@ -21,7 +22,8 @@ class TransactionIdTest {
     void rejectsNonUuidV7TransactionId() {
         var exception = assertThrows(LedgerException.class, () -> new TransactionId(UUID.randomUUID()));
 
-        assertEquals(LedgerErrorCode.INVALID_TRANSACTION_ID, exception.code());
+        assertInstanceOf(InvalidTransactionIdException.class, exception);
+        assertEquals("invalid_transaction_id", exception.wireCode());
     }
 
     private static UUID uuidV7(long seed) {

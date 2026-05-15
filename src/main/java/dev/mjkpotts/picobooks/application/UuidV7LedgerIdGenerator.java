@@ -7,6 +7,9 @@ import java.time.Clock;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
+/**
+ * UUID v7 ledger identifier generator backed by the system clock and secure randomness.
+ */
 @Component
 final class UuidV7LedgerIdGenerator implements LedgerIdGenerator {
 

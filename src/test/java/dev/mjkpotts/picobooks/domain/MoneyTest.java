@@ -1,6 +1,7 @@
 package dev.mjkpotts.picobooks.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,8 @@ class MoneyTest {
     void rejectsNonPositiveAmount() {
         var exception = assertThrows(LedgerException.class, () -> new Money(0, "GBP"));
 
-        assertEquals(LedgerErrorCode.INVALID_AMOUNT, exception.code());
+        assertInstanceOf(InvalidAmountException.class, exception);
+        assertEquals("invalid_amount", exception.wireCode());
         assertEquals("Amount value must be positive", exception.getMessage());
     }
 
@@ -27,7 +29,8 @@ class MoneyTest {
     void rejectsBlankCurrency() {
         var exception = assertThrows(LedgerException.class, () -> new Money(100, " "));
 
-        assertEquals(LedgerErrorCode.INVALID_CURRENCY, exception.code());
+        assertInstanceOf(InvalidCurrencyException.class, exception);
+        assertEquals("invalid_currency", exception.wireCode());
         assertEquals("Currency is required", exception.getMessage());
     }
 
@@ -35,7 +38,8 @@ class MoneyTest {
     void rejectsInvalidCurrencyCode() {
         var exception = assertThrows(LedgerException.class, () -> new Money(100, "GB"));
 
-        assertEquals(LedgerErrorCode.INVALID_CURRENCY, exception.code());
+        assertInstanceOf(InvalidCurrencyException.class, exception);
+        assertEquals("invalid_currency", exception.wireCode());
         assertEquals("Currency must be a three-letter code", exception.getMessage());
     }
 }

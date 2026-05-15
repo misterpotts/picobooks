@@ -4,6 +4,9 @@ import dev.mjkpotts.picobooks.domain.Transaction;
 import dev.mjkpotts.picobooks.domain.TransactionType;
 import java.time.Instant;
 
+/**
+ * Response body for an accepted account ledger transaction.
+ */
 record TransactionResponse(
         String transactionId,
         String accountId,
