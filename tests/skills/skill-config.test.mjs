@@ -5,6 +5,7 @@ import { test } from "node:test";
 
 const repoRoot = resolve(import.meta.dirname, "..", "..");
 const skillRoot = join(repoRoot, ".codex", "skills", "pr-driven-delivery");
+const domainSkillRoot = join(repoRoot, ".codex", "skills", "domain-object-testability");
 
 test("pr-driven-delivery skill has required frontmatter and workflow terms", () => {
   const skillPath = join(skillRoot, "SKILL.md");
@@ -40,6 +41,83 @@ test("pr-driven-delivery skill includes a comprehensive terse PR template", () =
   assert.match(text, /## Assumptions and Trade-offs/);
   assert.match(text, /## AI Assistance Disclosure/);
   assert.match(text, /Keep each section concise/);
+});
+
+test("domain-object-testability skill has required frontmatter and metadata", () => {
+  const skillPath = join(domainSkillRoot, "SKILL.md");
+  assert.equal(existsSync(skillPath), true);
+
+  const text = readFileSync(skillPath, "utf8").replace(/\r\n/g, "\n");
+  assert.match(text, /^---\nname: domain-object-testability\n/s);
+  assert.match(text, /description: .*planning\/designing, implementing, or reviewing domain code/s);
+  assert.match(text, /Domain-Driven Design modeling/);
+  assert.match(text, /Elegant Objects object design/);
+  assert.match(text, /testability heuristics/);
+
+  const metadataPath = join(domainSkillRoot, "agents", "openai.yaml");
+  assert.equal(existsSync(metadataPath), true);
+
+  const metadata = readFileSync(metadataPath, "utf8");
+  assert.match(metadata, /display_name: "Domain Object Testability"/);
+  assert.match(metadata, /short_description: "Design testable domain objects"/);
+  assert.match(metadata, /default_prompt: "Use \$domain-object-testability/);
+});
+
+test("domain-object-testability skill covers the full domain change lifecycle", () => {
+  const skillPath = join(domainSkillRoot, "SKILL.md");
+  const text = readFileSync(skillPath, "utf8");
+
+  assert.match(text, /### Planning And Design/);
+  assert.match(text, /bounded context/);
+  assert.match(text, /ubiquitous language|domain language/);
+  assert.match(text, /Entities/);
+  assert.match(text, /Value objects/);
+  assert.match(text, /Domain services/);
+  assert.match(text, /Aggregates/);
+  assert.match(text, /test seams/);
+
+  assert.match(text, /### Implementation/);
+  assert.match(text, /behavior-rich objects/);
+  assert.match(text, /immutable value objects/);
+  assert.match(text, /Do not return `null`/);
+  assert.match(text, /Inject collaborators explicitly/);
+  assert.match(text, /hidden global state/);
+  assert.match(text, /utility dumping grounds/);
+  assert.match(text, /deep collaborator traversal/);
+
+  assert.match(text, /### Review/);
+  assert.match(text, /Spring pragmatism/);
+  assert.match(text, /domain behavior stayed inside domain objects/);
+  assert.match(text, /explicit and local/);
+});
+
+test("domain-object-testability skill includes focused primary-source references", () => {
+  const referencesRoot = join(domainSkillRoot, "references");
+  const expectedReferences = [
+    "elegant-objects.md",
+    "testability.md",
+    "domain-driven-design.md",
+  ];
+
+  for (const reference of expectedReferences) {
+    assert.equal(existsSync(join(referencesRoot, reference)), true);
+  }
+
+  const elegantObjects = readFileSync(join(referencesRoot, "elegant-objects.md"), "utf8");
+  assert.match(elegantObjects, /https:\/\/www\.elegantobjects\.org\//);
+  assert.match(elegantObjects, /yegor256\.com\/2014\/05\/05\/oop-alternative-to-utility-classes/);
+  assert.match(elegantObjects, /yegor256\.com\/2014\/05\/13\/why-null-is-bad/);
+  assert.match(elegantObjects, /Spring Boundary Exceptions/);
+
+  const testability = readFileSync(join(referencesRoot, "testability.md"), "utf8");
+  assert.match(testability, /github\.com\/mhevery\/guide-to-testable-code/);
+  assert.match(testability, /Constructors do work/);
+  assert.match(testability, /deep collaborator traversal|digging through several getters/);
+
+  const domainDrivenDesign = readFileSync(join(referencesRoot, "domain-driven-design.md"), "utf8");
+  assert.match(domainDrivenDesign, /martinfowler\.com\/bliki\/DomainDrivenDesign/);
+  assert.match(domainDrivenDesign, /bounded context/);
+  assert.match(domainDrivenDesign, /ubiquitous language/);
 });
 
 test("local workflow uses git hooks without a repo package.json", () => {
