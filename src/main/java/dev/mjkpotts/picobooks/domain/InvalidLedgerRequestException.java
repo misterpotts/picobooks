@@ -1,4 +1,4 @@
-package dev.mjkpotts.tinyledger.domain;
+package dev.mjkpotts.picobooks.domain;
 
 public final class InvalidLedgerRequestException extends RuntimeException {
 

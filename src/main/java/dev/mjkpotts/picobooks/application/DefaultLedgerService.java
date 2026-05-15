@@ -1,8 +1,8 @@
-package dev.mjkpotts.tinyledger.application;
+package dev.mjkpotts.picobooks.application;
 
-import dev.mjkpotts.tinyledger.domain.AccountId;
-import dev.mjkpotts.tinyledger.domain.LedgerEntry;
-import dev.mjkpotts.tinyledger.domain.Money;
+import dev.mjkpotts.picobooks.domain.AccountId;
+import dev.mjkpotts.picobooks.domain.LedgerEntry;
+import dev.mjkpotts.picobooks.domain.Money;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.tinyledger.domain.InvalidLedgerRequestException;
+import dev.mjkpotts.picobooks.domain.InvalidLedgerRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

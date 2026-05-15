@@ -1,4 +1,4 @@
-package dev.mjkpotts.tinyledger.domain;
+package dev.mjkpotts.picobooks.domain;
 
 public enum TransactionType {
     DEPOSIT,

@@ -1,12 +1,12 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import dev.mjkpotts.tinyledger.application.LedgerService;
-import dev.mjkpotts.tinyledger.application.RecordTransactionInput;
+import dev.mjkpotts.picobooks.application.LedgerService;
+import dev.mjkpotts.picobooks.application.RecordTransactionInput;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -48,23 +48,23 @@ class LedgerControllerIntegrationTest {
         LedgerService ledgerService() {
             return new LedgerService() {
                 @Override
-                public dev.mjkpotts.tinyledger.domain.LedgerEntry recordTransaction(
-                        dev.mjkpotts.tinyledger.domain.AccountId accountId,
+                public dev.mjkpotts.picobooks.domain.LedgerEntry recordTransaction(
+                        dev.mjkpotts.picobooks.domain.AccountId accountId,
                         RecordTransactionInput command
                 ) {
                     throw new UnsupportedOperationException("Ledger implementation intentionally left as a skeleton for Codex-assisted development.");
                 }
 
                 @Override
-                public dev.mjkpotts.tinyledger.domain.Money currentBalance(
-                        dev.mjkpotts.tinyledger.domain.AccountId accountId
+                public dev.mjkpotts.picobooks.domain.Money currentBalance(
+                        dev.mjkpotts.picobooks.domain.AccountId accountId
                 ) {
                     throw new UnsupportedOperationException("Ledger implementation intentionally left as a skeleton for Codex-assisted development.");
                 }
 
                 @Override
-                public java.util.List<dev.mjkpotts.tinyledger.domain.LedgerEntry> history(
-                        dev.mjkpotts.tinyledger.domain.AccountId accountId
+                public java.util.List<dev.mjkpotts.picobooks.domain.LedgerEntry> history(
+                        dev.mjkpotts.picobooks.domain.AccountId accountId
                 ) {
                     throw new UnsupportedOperationException("Ledger implementation intentionally left as a skeleton for Codex-assisted development.");
                 }

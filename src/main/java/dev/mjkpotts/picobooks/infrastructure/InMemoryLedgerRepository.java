@@ -1,7 +1,7 @@
-package dev.mjkpotts.tinyledger.infrastructure;
+package dev.mjkpotts.picobooks.infrastructure;
 
-import dev.mjkpotts.tinyledger.domain.AccountId;
-import dev.mjkpotts.tinyledger.domain.LedgerEntry;
+import dev.mjkpotts.picobooks.domain.AccountId;
+import dev.mjkpotts.picobooks.domain.LedgerEntry;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

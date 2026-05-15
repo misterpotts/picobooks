@@ -1,8 +1,8 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.tinyledger.application.RecordTransactionInput;
-import dev.mjkpotts.tinyledger.domain.Money;
-import dev.mjkpotts.tinyledger.domain.TransactionType;
+import dev.mjkpotts.picobooks.application.RecordTransactionInput;
+import dev.mjkpotts.picobooks.domain.Money;
+import dev.mjkpotts.picobooks.domain.TransactionType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
