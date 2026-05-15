@@ -26,6 +26,8 @@ Check implementation readiness:
 - Confirm affected interfaces, data flow, failure modes, and compatibility constraints are clear enough to implement.
 - Confirm tests and local gates are specific, including `mvn verify` for relevant repo changes.
 - Confirm any expected docs, README, OpenSpec specs, or PR body updates are named.
+- For spec-only documentation changes, do not plan tests that assert specific words exist in specs;
+  human review is the regression gate for spec prose.
 
 Check skill coverage:
 - Require `$pr-driven-delivery` for all repository changes.

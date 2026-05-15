@@ -32,6 +32,8 @@ Check repository constraints:
 Check verification:
 - Confirm focused tests cover the change and `mvn verify` ran after the latest relevant edits.
 - Confirm skill/config changes have appropriate Node tests and skill validation where applicable.
+- Do not require or add word-assertion tests for OpenSpec/spec prose; human review is the
+  regression gate for spec text.
 - Treat missing, stale, or failed verification as blocking unless the failure is explicitly documented
   and outside the implemented change.
 
