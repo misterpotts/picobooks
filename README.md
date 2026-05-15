@@ -1,6 +1,6 @@
 # Picobooks
 
-Picobooks is a deliberately small Java/Spring Boot tiny-ledger repository for the Teya take-home assessment.
+Picobooks is a deliberately small Java/Spring Boot ledger repository for the Teya take-home assessment.
 
 The repository is being built through short, reviewable pull requests. This initial state establishes the repository purpose and the contribution rules before application code is introduced.
 

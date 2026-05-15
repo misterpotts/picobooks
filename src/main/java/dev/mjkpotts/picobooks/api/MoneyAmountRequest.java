@@ -1,4 +1,4 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;

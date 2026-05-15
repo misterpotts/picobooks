@@ -1,7 +1,7 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.tinyledger.domain.LedgerEntry;
-import dev.mjkpotts.tinyledger.domain.TransactionType;
+import dev.mjkpotts.picobooks.domain.LedgerEntry;
+import dev.mjkpotts.picobooks.domain.TransactionType;
 import java.time.Instant;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
 import java.time.Instant;
 

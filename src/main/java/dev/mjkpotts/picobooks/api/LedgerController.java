@@ -1,7 +1,7 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.tinyledger.application.LedgerService;
-import dev.mjkpotts.tinyledger.domain.AccountId;
+import dev.mjkpotts.picobooks.application.LedgerService;
+import dev.mjkpotts.picobooks.domain.AccountId;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;

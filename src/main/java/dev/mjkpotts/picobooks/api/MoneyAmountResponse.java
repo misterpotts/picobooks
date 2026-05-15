@@ -1,6 +1,6 @@
-package dev.mjkpotts.tinyledger.api;
+package dev.mjkpotts.picobooks.api;
 
-import dev.mjkpotts.tinyledger.domain.Money;
+import dev.mjkpotts.picobooks.domain.Money;
 
 record MoneyAmountResponse(
         long amountMinor,
