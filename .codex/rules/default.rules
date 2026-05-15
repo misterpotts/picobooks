@@ -1,0 +1,39 @@
+# Project-local Codex execution policy examples.
+# Rules are loaded only after the project .codex layer is trusted.
+
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "Destructive recursive delete is not allowed in this assessment repository. Delete targeted files explicitly if needed.",
+    match = [
+        "rm -rf target",
+        "rm -rf /",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "push", "--force"],
+    decision = "forbidden",
+    justification = "Force pushing is not appropriate for this reviewable assessment workflow.",
+    match = [
+        "git push --force",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "clean", "-fdx"],
+    decision = "prompt",
+    justification = "Full workspace cleaning can remove useful local evidence. Confirm before use.",
+    match = [
+        "git clean -fdx",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "repo", "create"],
+    decision = "prompt",
+    justification = "Repository creation should be confirmed by a human.",
+    match = [
+        "gh repo create misterpotts/example --private",
+    ],
+)

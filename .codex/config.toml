@@ -1,0 +1,47 @@
+# Project-scoped Codex configuration.
+#
+# Codex loads project-scoped .codex/config.toml only after the project is trusted.
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+
+[features]
+hooks = true
+
+[[hooks.PreToolUse]]
+matcher = "^Bash$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.codex/hooks/pre_tool_use_policy.mjs"'
+timeout = 30
+statusMessage = "Checking command safety"
+
+[[hooks.PermissionRequest]]
+matcher = "^Bash$"
+
+[[hooks.PermissionRequest.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.codex/hooks/permission_request_policy.mjs"'
+timeout = 30
+statusMessage = "Checking escalation policy"
+
+[[hooks.PostToolUse]]
+matcher = "^Bash$"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_review.mjs"'
+timeout = 30
+statusMessage = "Reviewing command output"
+
+[[hooks.Stop]]
+
+[[hooks.Stop.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.codex/hooks/stop_quality_gate.mjs"'
+timeout = 30
+statusMessage = "Checking completion quality gates"

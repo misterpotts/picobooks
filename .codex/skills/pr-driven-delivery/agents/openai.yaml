@@ -1,0 +1,7 @@
+interface:
+  display_name: "PR Driven Delivery"
+  short_description: "Branch, PR, and commit workflow for this repo"
+  default_prompt: "Use $pr-driven-delivery to prepare a reviewable repository change through a non-draft PR."
+
+policy:
+  allow_implicit_invocation: true

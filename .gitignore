@@ -1,0 +1,39 @@
+# Build output
+
+target/
+out/
+build/
+
+# IDEs
+
+# Vendor's recommendations: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839-How-to-manage-projects-under-Version-Control-Systems
+# Rely instead on /.idea/.gitignore
+# Uncomment if you feel particularly passionate about excluding all IDE projest files from source control
+# .idea/
+.vscode/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# Logs and local runtime
+
+*.log
+logs/
+
+# OpenSpec active change workspace.
+# Active deltas are copied into PR descriptions and then applied to openspec/specs/**.
+
+openspec/changes/**
+
+# Codex local run state and private memory.
+
+.codex/runs/**
+.codex/tmp/**
+.codex/memory/**
+
+# Local environment
+
+.env
+.env.*
