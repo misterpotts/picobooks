@@ -10,9 +10,7 @@ final class HealthController {
     @GetMapping("/health")
     Map<String, String> health() {
         return Map.of(
-                "status", "UP",
-                "runtime", "spring-mvc-servlet",
-                "implementation", "skeleton"
+                "status", "UP"
         );
     }
 }

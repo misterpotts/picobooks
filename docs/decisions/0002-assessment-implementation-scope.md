@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for assessment implementation.
+Accepted.
 
 ## Context
 
@@ -16,15 +16,15 @@ Keep the implementation small and focused on the ledger behaviours.
 
 The ledger implementation must:
 
-- use integer minor units for money;
-- reject negative or zero amounts;
-- let the first movement establish account currency;
-- reject later movements in a different currency;
-- reject withdrawals that would overdraw;
-- expose transaction history with resulting balances;
-- keep storage in-memory;
-- include domain, service, and API tests;
-- document assumptions and trade-offs.
+- Use integer minor units for money.
+- Reject negative or zero amounts.
+- Let the first transaction establish account currency.
+- Reject later transactions in a different currency.
+- Reject withdrawals that would overdraw.
+- Expose transaction history with resulting balances.
+- Keep storage in-memory.
+- Include domain, service, and API tests.
+- Document assumptions and trade-offs.
 
 Do not add authentication, persistence, queues, Kafka, observability stacks, service discovery, containers, or deployment infrastructure unless explicitly required by the assessment.
 
@@ -32,7 +32,7 @@ Do not add authentication, persistence, queues, Kafka, observability stacks, ser
 
 The strongest assessment signal is a correct, well-tested ledger with explicit constraints and omissions.
 
-Adding production infrastructure would increase surface area, hide the core domain choices, and make the implementation harder to review within the assessment scope.
+Adding production infrastructure would increase surface area and make the implementation harder to review within the assessment scope.
 
 ## Consequences
 
@@ -46,7 +46,7 @@ Adding production infrastructure would increase surface area, hide the core doma
 ### Negative
 
 - Data is lost on restart.
-- There is no authentication or authorisation boundary.
+- There is no authentication or authorization boundary.
 - There is no production observability, deployment, or scaling story.
 - In-memory storage means concurrent update behaviour remains intentionally limited.
 

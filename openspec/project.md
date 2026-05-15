@@ -1,4 +1,4 @@
-# Project: Tiny Ledger
+# Project: Picobooks
 
 ## Purpose
 
@@ -16,7 +16,7 @@ It is not a production ledger, bank account platform, payment processor, reconci
 - Spring Boot 3 servlet/MVC API.
 - Java 25 with virtual threads enabled.
 - In-memory storage.
-- No authentication or authorisation.
+- No authentication or authorization.
 - No persistent database.
 - No distributed transaction guarantees.
 - No external services.
@@ -25,12 +25,13 @@ It is not a production ledger, bank account platform, payment processor, reconci
 
 Source-of-truth behaviour lives under `openspec/specs/**`.
 
-Active proposal deltas under `openspec/changes/**` are local working artefacts. They are intentionally gitignored and should be copied into PR descriptions before the corresponding source-of-truth spec is updated in the same PR.
+Active proposal deltas under `openspec/changes/**` are local working artefacts.
+They are intentionally gitignored and should be copied into PR descriptions before the corresponding source-of-truth spec is updated in the same PR.
 
 ## Terms
 
-- **Account**: a logical ledger holder identified by a path parameter.
-- **Transaction**: a requested deposit or withdrawal.
-- **Ledger entry**: the immutable record created when a transaction is accepted.
-- **Balance**: the current sum of accepted ledger entries for an account.
-- **Minor units**: integer representation of currency, such as pence for GBP.
+- **Account**: A logical ledger holder identified by a path parameter.
+- **Transaction**: A requested deposit or withdrawal.
+- **Ledger entry**: The immutable record created when a transaction is accepted.
+- **Balance**: The current sum of accepted ledger entries for an account.
+- **Minor units**: Integer representation of currency, such as pence for GBP.

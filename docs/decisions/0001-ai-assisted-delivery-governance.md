@@ -2,14 +2,11 @@
 
 ## Status
 
-Accepted for skeleton.
+Accepted.
 
 ## Context
 
-The assessment is intentionally small, but the Principal Engineer signal should include safe, reviewable use of AI-assisted engineering.
-
-OpenSpec normally keeps active change proposals in a local changes area. For this assessment, the desired workflow is to keep those active deltas out of the repository, place them in PR descriptions, and commit the resulting applied source-of-truth spec alongside the code change.
-
+The assessment is intentionally small, and intended to include safe, reviewable use of AI-assisted engineering.
 ## Decision
 
 Use OpenSpec-style deltas during development, but do not commit active `openspec/changes/**` folders.
@@ -23,7 +20,9 @@ Instead:
 
 ## Rationale
 
-Active deltas are review artefacts, not long-lived product artefacts. The pull request is the natural control point for intent, implementation, and verification evidence. The repository remains clean after merge while retaining current approved behaviour in `openspec/specs/**`.
+Active deltas are review artefacts, not long-lived product artefacts.
+The pull request is the natural control point for intent, implementation, and verification evidence.
+The repository remains clean after merge while retaining current approved behaviour in `openspec/specs/**`.
 
 ## Consequences
 
@@ -36,6 +35,7 @@ Active deltas are review artefacts, not long-lived product artefacts. The pull r
 
 ### Negative
 
+- This approach diverges from the standard OpenSpec workflow, and may require some effort for contributors to adopt.
 - The active delta workspace is not available after merge except through the PR history.
 - Developers must remember to copy deltas into PR descriptions.
 - Tooling cannot rely on committed `openspec/changes/**` folders.
