@@ -104,13 +104,13 @@ function skipsTests(tokens) {
   });
 }
 
-export function isMavenTestCommand(command) {
+export function isMavenVerifyCommand(command) {
   return commandSegments(command).some((segment) => {
     const tokens = tokenizeCommandSegment(segment);
     if (tokens.length === 0 || !isMavenExecutable(tokens[0])) {
       return false;
     }
-    return tokens.includes("test") && !skipsTests(tokens);
+    return tokens.includes("verify") && !skipsTests(tokens);
   });
 }
 

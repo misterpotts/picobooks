@@ -35,5 +35,6 @@ Use Codex and other agents as governed engineering assistants. Keep intent revie
 ## Initial Quality Gate
 
 Before opening or updating a PR, ensure the PR title and commit messages are Conventional Commit compatible.
+Run `mvn verify` so tests pass and JaCoCo confirms at least 80% project-level line coverage.
 
-CI enforces this on pull requests.
+CI enforces these gates on pull requests and pushes to `main`.

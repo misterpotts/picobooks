@@ -53,9 +53,10 @@ Keep commit bodies short. Omit the body for simple commits; when a body is usefu
 
 ## CI
 
-The initial CI workflow enforces Conventional Commit formatting for:
+The CI workflow runs on pull requests and pushes to `main`. It enforces:
 
-- pull request titles;
-- every commit in a pull request.
+- passing Maven verification with `mvn --batch-mode verify`;
+- at least 80% project-level line coverage through JaCoCo;
+- Conventional Commit formatting for pull request titles and every commit in a pull request.
 
 CI installs commitlint at runtime without committing a local Node package manifest or lockfile.
