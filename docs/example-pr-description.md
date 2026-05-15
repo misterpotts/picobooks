@@ -57,9 +57,9 @@ openspec/specs/tiny-ledger/spec.md
 
 ## Implementation Summary
 
-- Spring MVC controllers for money movement, balance, and transaction history.
+- Spring MVC controllers for money transactions, balance, and transaction history.
 - Application service for ledger use cases.
-- Domain rules for money, currency, movement type, and resulting balance.
+- Domain rules for money, currency, transaction type, and resulting balance.
 - In-memory append-only repository.
 - Validation and API error mapping.
 
@@ -72,18 +72,18 @@ mvn test
 Manual examples:
 
 ```bash
-curl -X POST http://localhost:8080/accounts/merchant-123/movements \
+curl -X POST http://localhost:8080/accounts/merchant-123/transactions \
   -H "Content-Type: application/json" \
   -d '{"type":"DEPOSIT","amount":{"amountMinor":10000,"currency":"GBP"},"reference":"Initial deposit"}'
 
 curl http://localhost:8080/accounts/merchant-123/balance
-curl http://localhost:8080/accounts/merchant-123/movements
+curl http://localhost:8080/accounts/merchant-123/transactions
 ```
 
 ## Assumptions
 
 - Amounts are integer minor units.
-- First movement establishes account currency.
+- First transaction establishes account currency.
 - Withdrawals cannot overdraw.
 - In-memory state is lost on restart.
 - Authentication and authorisation are out of scope.

@@ -61,7 +61,7 @@ The service SHALL allow a client to view transaction history for an account.
 
 - WHEN a client requests transaction history for an account
 - THEN the service returns accepted ledger entries for that account
-- AND each entry includes movement type, amount, resulting balance, reference, and occurrence time.
+- AND each entry includes transaction type, amount, resulting balance, reference, and occurrence time.
 
 ### Requirement: Represent money in minor units
 
@@ -81,16 +81,16 @@ The service SHALL represent money as integer minor units with a three-letter cur
 
 ### Requirement: Use a single currency per account
 
-The service SHALL treat the first accepted movement as establishing the account currency.
+The service SHALL treat the first accepted transaction as establishing the account currency.
 
-#### Scenario: First movement establishes currency
+#### Scenario: First transaction establishes currency
 
-- WHEN the first movement for an account is accepted
-- THEN that movement's currency becomes the account currency
+- WHEN the first transaction for an account is accepted
+- THEN that transaction's currency becomes the account currency
 
-#### Scenario: Later movement with different currency is rejected
+#### Scenario: Later transaction with different currency is rejected
 
 - GIVEN an account has an established currency
-- WHEN a later movement uses a different currency
+- WHEN a later transaction uses a different currency
 - THEN the service rejects the request
 - AND no ledger entry is recorded

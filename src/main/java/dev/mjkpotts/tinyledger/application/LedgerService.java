@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LedgerService {
 
-    LedgerEntry recordMovement(AccountId accountId, RecordMovementCommand command);
+    LedgerEntry recordTransaction(AccountId accountId, RecordTransactionCommand command);
 
     Money currentBalance(AccountId accountId);
 

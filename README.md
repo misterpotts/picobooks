@@ -45,7 +45,7 @@ Commit messages and pull request titles must use Conventional Commits, for examp
 
 ```text
 chore: add initial repository governance
-feat: implement ledger movements
+feat: implement ledger transactions
 fix: reject overdrawn withdrawals
 ```
 

@@ -12,7 +12,7 @@ final class SkeletonLedgerService implements LedgerService {
     private static final String MESSAGE = "Ledger implementation intentionally left as a skeleton for Codex-assisted development.";
 
     @Override
-    public LedgerEntry recordMovement(AccountId accountId, RecordMovementCommand command) {
+    public LedgerEntry recordTransaction(AccountId accountId, RecordTransactionCommand command) {
         throw new UnsupportedOperationException(MESSAGE);
     }
 

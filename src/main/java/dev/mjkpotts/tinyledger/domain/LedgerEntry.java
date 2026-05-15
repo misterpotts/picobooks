@@ -6,7 +6,7 @@ import java.util.UUID;
 public record LedgerEntry(
         UUID transactionId,
         AccountId accountId,
-        MovementType type,
+        TransactionType type,
         Money amount,
         Money resultingBalance,
         String reference,

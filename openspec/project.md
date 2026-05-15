@@ -6,7 +6,7 @@ A tiny local ledger API for the Teya take-home assessment.
 
 ## Product boundary
 
-The service records simple money movements for accounts and exposes balance and transaction history.
+The service records simple money transactions for accounts and exposes balance and transaction history.
 
 It is not a production ledger, bank account platform, payment processor, reconciliation engine, or accounting system.
 
@@ -30,7 +30,7 @@ Active proposal deltas under `openspec/changes/**` are local working artefacts. 
 ## Terms
 
 - **Account**: a logical ledger holder identified by a path parameter.
-- **Movement**: a requested deposit or withdrawal.
-- **Ledger entry**: the immutable record created when a movement is accepted.
+- **Transaction**: a requested deposit or withdrawal.
+- **Ledger entry**: the immutable record created when a transaction is accepted.
 - **Balance**: the current sum of accepted ledger entries for an account.
 - **Minor units**: integer representation of currency, such as pence for GBP.

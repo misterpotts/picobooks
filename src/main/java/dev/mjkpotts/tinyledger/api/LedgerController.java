@@ -22,12 +22,12 @@ final class LedgerController {
         this.ledgerService = ledgerService;
     }
 
-    @PostMapping("/movements")
-    ResponseEntity<LedgerEntryResponse> recordMovement(
+    @PostMapping("/transactions")
+    ResponseEntity<LedgerEntryResponse> recordTransaction(
             @PathVariable String accountId,
-            @Valid @RequestBody RecordMovementRequest request
+            @Valid @RequestBody RecordTransactionRequest request
     ) {
-        var entry = ledgerService.recordMovement(new AccountId(accountId), request.toCommand());
+        var entry = ledgerService.recordTransaction(new AccountId(accountId), request.toCommand());
         return ResponseEntity.status(201).body(LedgerEntryResponse.from(entry));
     }
 
@@ -37,7 +37,7 @@ final class LedgerController {
         return new BalanceResponse(accountId, MoneyAmountResponse.from(balance));
     }
 
-    @GetMapping("/movements")
+    @GetMapping("/transactions")
     List<LedgerEntryResponse> history(@PathVariable String accountId) {
         return ledgerService.history(new AccountId(accountId))
                 .stream()

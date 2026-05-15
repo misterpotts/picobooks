@@ -1,6 +1,6 @@
 package dev.mjkpotts.tinyledger.domain;
 
-public enum MovementType {
+public enum TransactionType {
     DEPOSIT,
     WITHDRAWAL
 }

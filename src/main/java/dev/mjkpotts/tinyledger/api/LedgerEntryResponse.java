@@ -1,14 +1,14 @@
 package dev.mjkpotts.tinyledger.api;
 
 import dev.mjkpotts.tinyledger.domain.LedgerEntry;
-import dev.mjkpotts.tinyledger.domain.MovementType;
+import dev.mjkpotts.tinyledger.domain.TransactionType;
 import java.time.Instant;
 import java.util.UUID;
 
 record LedgerEntryResponse(
         UUID transactionId,
         String accountId,
-        MovementType type,
+        TransactionType type,
         MoneyAmountResponse amount,
         MoneyAmountResponse resultingBalance,
         String reference,

@@ -23,8 +23,8 @@ class LedgerControllerSkeletonTest {
     private MockMvc mockMvc;
 
     @Test
-    void recordMovementReturnsNotImplementedUntilLedgerIsBuilt() throws Exception {
-        mockMvc.perform(post("/accounts/merchant-123/movements")
+    void recordTransactionReturnsNotImplementedUntilLedgerIsBuilt() throws Exception {
+        mockMvc.perform(post("/accounts/merchant-123/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -47,9 +47,9 @@ class LedgerControllerSkeletonTest {
         LedgerService ledgerService() {
             return new LedgerService() {
                 @Override
-                public dev.mjkpotts.tinyledger.domain.LedgerEntry recordMovement(
+                public dev.mjkpotts.tinyledger.domain.LedgerEntry recordTransaction(
                         dev.mjkpotts.tinyledger.domain.AccountId accountId,
-                        dev.mjkpotts.tinyledger.application.RecordMovementCommand command
+                        dev.mjkpotts.tinyledger.application.RecordTransactionCommand command
                 ) {
                     throw new UnsupportedOperationException("Ledger implementation intentionally left as a skeleton for Codex-assisted development.");
                 }
