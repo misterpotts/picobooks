@@ -71,13 +71,13 @@ The service SHALL represent money as integer minor units with a three-letter cur
 
 - WHEN a client submits an amount
 - THEN the amount is represented as an integer `amountMinor`
-- AND not as a floating point decimal.
+- AND not as a floating point decimal
 
 #### Scenario: Non-positive amounts are rejected
 
 - WHEN a client submits zero or a negative amount
 - THEN the service rejects the request
-- AND no ledger entry is recorded.
+- AND no ledger entry is recorded
 
 ### Requirement: Use a single currency per account
 
@@ -86,11 +86,11 @@ The service SHALL treat the first accepted movement as establishing the account 
 #### Scenario: First movement establishes currency
 
 - WHEN the first movement for an account is accepted
-- THEN that movement's currency becomes the account currency.
+- THEN that movement's currency becomes the account currency
 
 #### Scenario: Later movement with different currency is rejected
 
 - GIVEN an account has an established currency
 - WHEN a later movement uses a different currency
 - THEN the service rejects the request
-- AND no ledger entry is recorded.
+- AND no ledger entry is recorded
