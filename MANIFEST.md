@@ -69,3 +69,4 @@
 - `src/test/java/dev/mjkpotts/picobooks/api/LedgerControllerSkeletonTest.java`
 - `tests/hooks/codex-hooks.test.mjs`
 - `tests/skills/skill-config.test.mjs`
+- `tests/specs/picobooks-spec.test.mjs`
