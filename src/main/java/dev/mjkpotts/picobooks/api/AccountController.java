@@ -2,8 +2,7 @@ package dev.mjkpotts.picobooks.api;
 
 import dev.mjkpotts.picobooks.application.LedgerService;
 import dev.mjkpotts.picobooks.domain.AccountId;
-import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
-import dev.mjkpotts.picobooks.domain.LedgerException;
+import dev.mjkpotts.picobooks.domain.InvalidRequestException;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * HTTP adapter for account creation, balances, and account-scoped ledger transactions.
+ */
 @RestController
 @RequestMapping("/accounts")
 final class AccountController {
@@ -56,14 +58,14 @@ final class AccountController {
 
     private static CreateAccountRequest requireRequest(CreateAccountRequest request) {
         if (request == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Request body is required");
+            throw new InvalidRequestException("Request body is required");
         }
         return request;
     }
 
     private static RecordTransactionRequest requireRequest(RecordTransactionRequest request) {
         if (request == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_REQUEST, "Request body is required");
+            throw new InvalidRequestException("Request body is required");
         }
         return request;
     }

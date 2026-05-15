@@ -2,11 +2,14 @@ package dev.mjkpotts.picobooks.domain;
 
 import java.util.UUID;
 
+/**
+ * Value object for a service-generated UUID v7 account identifier.
+ */
 public record AccountId(UUID value) {
 
     public AccountId {
         if (value == null || value.version() != 7) {
-            throw new LedgerException(LedgerErrorCode.INVALID_ACCOUNT_ID, "accountId must be a UUID v7 value");
+            throw new InvalidAccountIdException();
         }
     }
 
@@ -22,7 +25,7 @@ public record AccountId(UUID value) {
         try {
             return UUID.fromString(value);
         } catch (IllegalArgumentException | NullPointerException exception) {
-            throw new LedgerException(LedgerErrorCode.INVALID_ACCOUNT_ID, "accountId must be a UUID v7 value");
+            throw new InvalidAccountIdException();
         }
     }
 }

@@ -5,6 +5,9 @@ import dev.mjkpotts.picobooks.domain.Balance;
 import dev.mjkpotts.picobooks.domain.Transaction;
 import java.util.List;
 
+/**
+ * Application boundary for account creation, ledger writes, and ledger reads.
+ */
 public interface LedgerService {
 
     CreatedAccount createAccount(String currency);

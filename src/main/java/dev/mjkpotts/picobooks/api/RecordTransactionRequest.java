@@ -1,11 +1,14 @@
 package dev.mjkpotts.picobooks.api;
 
 import dev.mjkpotts.picobooks.application.RecordTransactionInput;
-import dev.mjkpotts.picobooks.domain.LedgerErrorCode;
-import dev.mjkpotts.picobooks.domain.LedgerException;
+import dev.mjkpotts.picobooks.domain.InvalidAmountException;
+import dev.mjkpotts.picobooks.domain.InvalidTransactionTypeException;
 import dev.mjkpotts.picobooks.domain.TransactionType;
 import java.util.Locale;
 
+/**
+ * Request body for recording a deposit or withdrawal against one account ledger.
+ */
 record RecordTransactionRequest(
         String type,
         MoneyAmountRequest amount,
@@ -14,10 +17,10 @@ record RecordTransactionRequest(
 
     RecordTransactionRequest {
         if (type == null || type.isBlank()) {
-            throw new LedgerException(LedgerErrorCode.INVALID_TRANSACTION_TYPE, "Transaction type is required");
+            throw new InvalidTransactionTypeException("Transaction type is required");
         }
         if (amount == null) {
-            throw new LedgerException(LedgerErrorCode.INVALID_AMOUNT, "Transaction amount is required");
+            throw new InvalidAmountException("Transaction amount is required");
         }
         type = type.trim().toUpperCase(Locale.ROOT);
         parseType(type);
@@ -31,7 +34,7 @@ record RecordTransactionRequest(
         try {
             return TransactionType.valueOf(type);
         } catch (IllegalArgumentException exception) {
-            throw new LedgerException(LedgerErrorCode.INVALID_TRANSACTION_TYPE, "Transaction type must be DEPOSIT or WITHDRAWAL");
+            throw new InvalidTransactionTypeException("Transaction type must be DEPOSIT or WITHDRAWAL");
         }
     }
 }

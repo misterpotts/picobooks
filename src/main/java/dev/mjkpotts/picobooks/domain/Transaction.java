@@ -3,6 +3,9 @@ package dev.mjkpotts.picobooks.domain;
 import java.time.Instant;
 import java.util.Objects;
 
+/**
+ * Immutable accepted ledger transaction with its resulting account balance.
+ */
 public record Transaction(
         TransactionId transactionId,
         AccountId accountId,

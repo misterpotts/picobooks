@@ -3,6 +3,9 @@ package dev.mjkpotts.picobooks.api;
 import dev.mjkpotts.picobooks.domain.Balance;
 import dev.mjkpotts.picobooks.domain.Money;
 
+/**
+ * Response representation of money or balance in currency base units.
+ */
 record MoneyAmountResponse(
         long value,
         String currency

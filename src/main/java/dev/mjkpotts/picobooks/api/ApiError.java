@@ -2,6 +2,9 @@ package dev.mjkpotts.picobooks.api;
 
 import java.time.Instant;
 
+/**
+ * Stable error response returned by the HTTP API.
+ */
 record ApiError(
         String code,
         String message,
