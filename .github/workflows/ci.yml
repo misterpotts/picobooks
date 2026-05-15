@@ -44,7 +44,9 @@ jobs:
         run: npm install --no-save --no-package-lock @commitlint/cli@19.8.1 @commitlint/config-conventional@19.8.1
 
       - name: Lint PR title
+        if: github.event_name == 'pull_request'
         run: echo "${{ github.event.pull_request.title }}" | npx commitlint
 
       - name: Lint PR commits
+        if: github.event_name == 'pull_request'
         run: npx commitlint --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}"
