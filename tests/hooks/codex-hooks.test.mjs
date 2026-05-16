@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { test } from "node:test";
+import { markerDirectories, markerPaths } from "../../.codex/hooks/hook_utils.mjs";
 
 const repoRoot = resolve(import.meta.dirname, "..", "..");
 const hooksDir = join(repoRoot, ".codex", "hooks");
@@ -137,6 +138,52 @@ test("post hook records a content-addressed Maven verify marker", () => {
   const marker = JSON.parse(readFileSync(join(dir, ".codex", "tmp", "last-test-success.json"), "utf8"));
   assert.equal(marker.command, "mvn verify");
   assert.match(marker.fingerprint, /^[a-f0-9]{64}$/);
+});
+
+test("post and stop hooks use fallback marker directory when .codex/tmp is unusable", () => {
+  const dir = makeRepo();
+  const fallbackDirectory = markerDirectories(dir)[1];
+  rmSync(fallbackDirectory, { recursive: true, force: true });
+
+  mkdirSync(join(dir, ".codex"), { recursive: true });
+  writeFileSync(join(dir, ".codex", "tmp"), "not a directory\n");
+  writeFileSync(join(dir, "README.md"), "edit before verification\n");
+
+  runHook("post_tool_use_review.mjs", {
+    cwd: dir,
+    tool_input: { command: "mvn verify" },
+    tool_response: { exit_code: 0 },
+  }, dir);
+
+  const marker = JSON.parse(readFileSync(markerPaths(dir, "last-test-success.json")[1], "utf8"));
+  assert.equal(marker.command, "mvn verify");
+  assert.match(marker.fingerprint, /^[a-f0-9]{64}$/);
+
+  const payload = runHook("stop_quality_gate.mjs", { cwd: dir }, dir);
+  assert.equal(payload.continue, true);
+  assert.equal(payload.decision, undefined);
+});
+
+test("post hook reports marker persistence failure when all marker directories are unusable", () => {
+  const dir = makeRepo();
+  const fallbackDirectory = markerDirectories(dir)[1];
+  rmSync(fallbackDirectory, { recursive: true, force: true });
+
+  mkdirSync(join(dir, ".codex"), { recursive: true });
+  writeFileSync(join(dir, ".codex", "tmp"), "not a directory\n");
+  mkdirSync(dirname(fallbackDirectory), { recursive: true });
+  writeFileSync(fallbackDirectory, "not a directory\n");
+
+  const payload = runHook("post_tool_use_review.mjs", {
+    cwd: dir,
+    tool_input: { command: "mvn verify" },
+    tool_response: { exit_code: 0 },
+  }, dir);
+
+  assert.equal(payload.hookSpecificOutput.hookEventName, "PostToolUse");
+  assert.match(payload.hookSpecificOutput.additionalContext, /could not persist its marker/);
+  assert.match(payload.hookSpecificOutput.additionalContext, /EEXIST|ENOTDIR|EPERM|EACCES/);
+  assert.match(payload.hookSpecificOutput.additionalContext, /stop-gate will block/);
 });
 
 test("post hook does not treat Maven test as the verification gate", () => {

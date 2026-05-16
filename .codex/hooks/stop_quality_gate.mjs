@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import {
   blockStop,
   inGitRepo,
   readEvent,
+  readMarkerCandidates,
   relevantChangedFiles,
   repositoryConstraintViolations,
   trackedOpenSpecChanges,
@@ -12,26 +11,14 @@ import {
   writeJson,
 } from "./hook_utils.mjs";
 
-function readMarker(cwd, filename) {
-  const markerPath = join(cwd, ".codex", "tmp", filename);
-  if (!existsSync(markerPath)) {
-    return null;
-  }
-  try {
-    return JSON.parse(readFileSync(markerPath, "utf8"));
-  } catch {
-    return null;
-  }
-}
-
 function hasCurrentTestRun(cwd) {
   const fingerprint = workspaceFingerprint(cwd);
-  const success = readMarker(cwd, "last-test-success.json");
-  if (success && success.fingerprint === fingerprint) {
+  const successMarkers = readMarkerCandidates(cwd, "last-test-success.json");
+  if (successMarkers.some((marker) => marker.fingerprint === fingerprint)) {
     return true;
   }
-  const run = readMarker(cwd, "last-test-run.json");
-  return Boolean(run && run.fingerprint === fingerprint);
+  const runMarkers = readMarkerCandidates(cwd, "last-test-run.json");
+  return runMarkers.some((marker) => marker.fingerprint === fingerprint);
 }
 
 const event = await readEvent();

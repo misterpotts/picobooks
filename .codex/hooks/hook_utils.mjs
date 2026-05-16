@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -172,6 +173,55 @@ export function relevantChangedFiles(cwd) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+export function markerDirectories(cwd) {
+  return [
+    join(cwd, ".codex", "tmp"),
+    join(tmpdir(), "picobooks-codex-hook-markers", sha256(cwd)),
+  ];
+}
+
+export function markerPaths(cwd, filename) {
+  return markerDirectories(cwd).map((directory) => join(directory, filename));
+}
+
+export function readMarkerCandidates(cwd, filename) {
+  const markers = [];
+  for (const path of markerPaths(cwd, filename)) {
+    if (!existsSync(path)) {
+      continue;
+    }
+    try {
+      markers.push(JSON.parse(readFileSync(path, "utf8")));
+    } catch {
+      // Ignore malformed or inaccessible marker files; another marker location may be valid.
+    }
+  }
+  return markers;
+}
+
+export function writeMarker(cwd, filename, payload) {
+  let lastError = null;
+  const failures = [];
+  for (const directory of markerDirectories(cwd)) {
+    try {
+      mkdirSync(directory, { recursive: true });
+      writeFileSync(
+        join(directory, filename),
+        `${JSON.stringify(payload, null, 2)}\n`,
+        "utf8",
+      );
+      return;
+    } catch (error) {
+      lastError = error;
+      failures.push(`${directory}: ${error.code ?? error.message}`);
+    }
+  }
+  const error = new Error(`Unable to write marker ${filename}: ${failures.join("; ")}`);
+  error.code = lastError?.code;
+  error.markerFailures = failures;
+  throw error;
 }
 
 function fileHash(cwd, file) {

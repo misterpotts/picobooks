@@ -1,23 +1,12 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import {
   additionalContext,
   commandFromEvent,
   isMavenVerifyCommand,
   readEvent,
+  writeMarker,
   workspaceFingerprint,
 } from "./hook_utils.mjs";
-
-function writeMarker(cwd, filename, payload) {
-  const markerDir = join(cwd, ".codex", "tmp");
-  mkdirSync(markerDir, { recursive: true });
-  writeFileSync(
-    join(markerDir, filename),
-    `${JSON.stringify(payload, null, 2)}\n`,
-    "utf8",
-  );
-}
 
 function recordTestRunMarker(cwd, command, exitCode, passed) {
   writeMarker(cwd, "last-test-run.json", {
@@ -37,6 +26,13 @@ function recordSuccessMarker(cwd, command) {
   });
 }
 
+function markerPersistenceFailure(error) {
+  if (Array.isArray(error.markerFailures) && error.markerFailures.length > 0) {
+    return error.markerFailures.join("; ");
+  }
+  return error.code ?? error.message;
+}
+
 const event = await readEvent();
 const cwd = String(event.cwd ?? process.cwd());
 const command = commandFromEvent(event);
@@ -45,9 +41,19 @@ const isMavenVerify = isMavenVerifyCommand(command);
 
 if (isMavenVerify && typeof exitCode === "number") {
   const passed = exitCode === 0;
-  recordTestRunMarker(cwd, command, exitCode, passed);
+  try {
+    recordTestRunMarker(cwd, command, exitCode, passed);
+    if (passed) {
+      recordSuccessMarker(cwd, command);
+    }
+  } catch (error) {
+    additionalContext(
+      "PostToolUse",
+      `mvn verify exited ${exitCode} but the hook could not persist its marker to either .codex/tmp or the OS tmpdir fallback (${markerPersistenceFailure(error)}). The stop-gate will block this work as unverified; please make one of the marker directories writable for this identity.`,
+    );
+    process.exit(0);
+  }
   if (passed) {
-    recordSuccessMarker(cwd, command);
     process.exit(0);
   }
   additionalContext("PostToolUse", "The Maven verification command failed. Do not present the work as complete until tests and coverage pass or the failure is explicitly documented in the final response.");
