@@ -1,23 +1,12 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import {
   additionalContext,
   commandFromEvent,
   isMavenVerifyCommand,
   readEvent,
+  writeMarker,
   workspaceFingerprint,
 } from "./hook_utils.mjs";
-
-function writeMarker(cwd, filename, payload) {
-  const markerDir = join(cwd, ".codex", "tmp");
-  mkdirSync(markerDir, { recursive: true });
-  writeFileSync(
-    join(markerDir, filename),
-    `${JSON.stringify(payload, null, 2)}\n`,
-    "utf8",
-  );
-}
 
 function recordTestRunMarker(cwd, command, exitCode, passed) {
   writeMarker(cwd, "last-test-run.json", {
