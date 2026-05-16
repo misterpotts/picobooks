@@ -203,6 +203,7 @@ export function readMarkerCandidates(cwd, filename) {
 
 export function writeMarker(cwd, filename, payload) {
   let lastError = null;
+  const failures = [];
   for (const directory of markerDirectories(cwd)) {
     try {
       mkdirSync(directory, { recursive: true });
@@ -214,9 +215,13 @@ export function writeMarker(cwd, filename, payload) {
       return;
     } catch (error) {
       lastError = error;
+      failures.push(`${directory}: ${error.code ?? error.message}`);
     }
   }
-  throw lastError ?? new Error(`Unable to write marker ${filename}`);
+  const error = new Error(`Unable to write marker ${filename}: ${failures.join("; ")}`);
+  error.code = lastError?.code;
+  error.markerFailures = failures;
+  throw error;
 }
 
 function fileHash(cwd, file) {
